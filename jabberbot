@@ -1,0 +1,55 @@
+#!/bin/bash
+
+is_running() {
+    PID=`ps -ef | grep runbot.php | grep -v grep | awk {'print $2'}`; 
+    if [ ! -z $PID ]; then
+        echo $PID;
+    	return 0
+    fi
+    return 1
+}
+
+start() {
+  if [ ! -d Log ]; then
+      mkdir Log;
+   fi
+   if [ ! -f Log/JabberBot.log ]; then
+       touch Log/JabberBot.log;
+   fi
+   
+  php Scripts/runbot.php >> Log/JabberBot.log 2>&1
+}
+
+case $1 in
+	start)
+	
+	  if ! is_running; then
+	      start;
+	      echo "Bot Started";
+	  else
+	      echo "Bot is already Running";
+	  fi	
+	;;
+	stop)
+	 	  if ! is_running; then
+	      echo "Bot is not running"
+	  else
+	      PID=$(is_running);
+	      kill $PID;
+	      echo "Bot killed"
+	  fi	 
+	;;
+	restart)
+		 if  is_running; then
+		 	 PID=$(is_running);
+	         kill $PID;
+	         echo 'Killed.... pausing'
+	         sleep 5
+	    fi
+	    
+	    start
+	 ;;
+	  *)
+		echo "Usage: $0 {start|stop|restart}"
+     ;;
+esac

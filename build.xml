@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<project name="JabberBot" basedir=".">
+
+   	<property file="deploy.properties"/>
+
+	<target name="check-config">
+        <echo>Checking for config files</echo>
+        <available file="Config/JabberBot.ini" property="config-present"/>
+    </target>
+
+    <target name="copy-config" depends="check-config" unless="config-present">
+        <delete dir="${basedir}/Config" />
+        <mkdir dir="${basedir}/Config" />
+        <copy file="${basedir}/Install/JabberBot.ini" todir="${basedir}/Config" />
+        <copy file="${basedir}/Install/database.ini"  todir="${basedir}/Config" />	
+    </target>
+
+    <target name="clean" >
+        <delete dir="${basedir}/Build" />
+        <mkdir dir="${basedir}/Build" />
+        <mkdir dir="${basedir}/Build/logs" />
+        <mkdir dir="${basedir}/Build/graph" />
+        <mkdir dir="${basedir}/Build/docs" />
+    </target>
+    
+    <target name="php-documentor">
+        <exec executable="phpdoc" dir="${basedir}/" logerror="on">
+            <arg line="--title '${ant.project.name}' -t ${basedir}/Build/docs -d ${basedir}/Api,${basedir}/Library/JabberBot,${basedir}/Scripts"/>
+        </exec>
+    </target>
+
+    <target name="phpunit" depends="clean">
+        <exec dir="Test/" executable="phpunit" failonerror="true">
+            <arg line="--coverage-html=${basedir}/Build/coverage/" />
+            <arg line="--coverage-clover=${basedir}/Build/logs/clover.xml" />
+            <arg line="--log-junit=${basedir}/Build/logs/junit.xml" />
+            <arg line="-dmemory_limit=-1" />
+        </exec>
+    </target>
+
+    <target name="php-codesniffer">
+        <exec executable="phpcs" dir="${basedir}/">
+            <arg line="-v" />
+            <arg line="-n" />
+            <arg line="--extensions=php" />
+            <arg line="--standard=Zend" />
+            <arg line="--report=full" />
+            <arg line="--report-file=${basedir}/Build/logs/codesnifferreport" />
+            <arg line="--ignore=Library/XMPHP" />
+            <arg line="${basedir}/" />
+        </exec>
+    </target>
+    
+    <target name="deploy">
+
+      	<tar destfile="/tmp/JabberBot.tgz" 
+           compression="gzip"
+           basedir="${basedir}"
+           excludes="Config/**, Build/**, .**, Test/**">
+      
+      </tar>
+      <exec executable="scp" failonerror="true">
+      	<arg line="/tmp/JabberBot.tgz" />
+      	<arg line="${deploy.user}@${deploy.host}:/tmp/JabberBot.tgz" />
+      </exec>
+      
+      <exec executable="ssh" failonerror="true">
+      	<arg line="${deploy.user}@${deploy.host}" />
+      	<arg line="rm -rf ${deploy.basedir}; mkdir ${deploy.basedir}; tar -xzf /tmp/JabberBot.tgz -C ${deploy.basedir};" />
+      </exec>
+      
+      <!--
+      <scp file="/tmp/JabberBot.tgz"
+           todir="${deploy.user}@${deploy.host}:/tmp" 
+           passphrase="${deploy.passphrase}"
+           password="${deploy.password}"/>
+      
+      <sshexec host="${deploy.host}"
+               username="{$deploy.user}"
+               password="${deploy.password}"
+               command="tar -xzf /tmp/JabberBot.tgz -C ${deploy.basedir}" />
+               -->
+    </target>
+    	
+    <target name="install" depends="copy-config,php-documentor" />
+    <target name="review" depends="clean,phpunit,php-documentor,php-codesniffer" />
+
+</project> 

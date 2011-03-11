@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="../Scripts/Bootstrap.inc.php" colors="true">
+	<testsuite name="JabberBot">
+		<directory suffix=".php">.</directory>
+	</testsuite>
+	<filter>
+		<whitelist>
+                    <directory suffix=".php">../Library/JabberBot</directory>
+			<exclude>
+				<directory suffix=".test.php">./</directory>
+			</exclude>
+		</whitelist>
+	</filter>
+</phpunit>
