@@ -1,3 +1,35 @@
-mysql -uroot -p < Install/install.sql
+JabberBot Install Instructions
+
+1. If you have ant installed, go to the JabberBot folder any type:
+# ant install
+
+Otherwise:
 mkdir Config
-cp Install/*.ini Config
+cp Install/*.ini Config/
+
+2. Edit both ini files in the Config/ folder with your Jabber server and db details.
+
+3. Use the install.sql file to create the database tables.
+First you'll need to create a database:
+# mysql -uroot -p
+> create database dbJabberBot;
+> GRANT SELECT, UPDATE, DELETE on dbJabberBot.* TO 'user' IDENTIFIED BY 'password';  
+(substitute whatever you want to use for the username and password here)
+
+Then import the tables:
+> use dbJabberBot;
+> source Install/install.sql;
+
+4. Configure Apache for the Api.
+To enable the api, you need to somehow get the JabberBot/Public folder to be publicly acessible.
+If you've only got a basic apache setup, then it'll probaby be enough just to add a simlink from /var/www, e.g:
+# ln -s ~/JabberBot/Public /var/www/jabberbotapi
+
+Then the api should be accessable at http://<host>/jabberbotapi
+
+Alternatively you may need to set up a vhost.
+
+5. Remote deployment
+If you want to run the bot on a remote server, then you may find the auto-deploy script in the build.xml file useful.
+First, you'll need to edit Install/deploy.properties giving details of the remote server.  Then:
+# ant deploy  

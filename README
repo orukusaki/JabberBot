@@ -1,0 +1,43 @@
+JabberBot - PHP XMPP Chat Bot
+
+A chat bot written in PHP, to be used on an XMPP (Jabber) network.  Designed to be easily extendible and
+customisable.  Contains a modified copy of XMPPHP v0.1 by Nathan Fritz.
+
+This is not the kind of bot you can have an in-depth conversation with, it's built to recognise various 
+commands and respond to them after performing whatever action you've associated with it.  It's ideal for 
+interfacing with internal or external services.  Every command can be access controlled, and the Access Control
+List can be manipulated via a chat session (subject to the same access controls of course).  The commands are
+written in PHP as individual class files, so you'll need to be able to code PHP in order to extend the bot's
+functionality.
+
+Requirements:
+php5 php5-cli php5-curl mysql-server mysql-client apache2 (for the api) 
+Optional (to help :
+ant php-pear
+Pear modules used:
+phpunit phpcs php-documentor
+
+Installation:
+See separate INSTALL file, or for a quick start, try:
+#cd ~/JabberBot (or wherever you've put it)
+#ant install
+Edit the config files in /Config
+Use the Install/install.sql file to build the database
+run the bot using:
+#./jabberbot start
+
+Version History:
+0.1 - first beta release.
+
+License:
+http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
+
+Copyright: 
+(C) 2011 Plusnet / Peter Smith
+
+Contact:
+Peter Smith psmith@plus.net peter@orukusaki.co.uk
+
+Hosted on Github:
+https://github.com/orukusaki/JabberBot/
+git://github.com/orukusaki/JabberBot.git

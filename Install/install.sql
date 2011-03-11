@@ -1,6 +1,3 @@
-CREATE database IF NOT EXISTS dbJabberBot;
-GRANT ALL ON dbJabberBot.* TO 'QAUser' IDENTIFIED by 'QAPass';
-USE dbJabberBot;
 --
 -- Table structure for table `tblAcl`
 --

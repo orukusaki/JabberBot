@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="JabberBot" basedir=".">
 
-   	<property file="deploy.properties"/>
+   	<property file="Install/deploy.properties"/>
 
 	<target name="check-config">
         <echo>Checking for config files</echo>
