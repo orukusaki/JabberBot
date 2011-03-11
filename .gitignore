@@ -1,0 +1,10 @@
+Config/
+Build/
+Log/
+*~
+*.swap
+.project
+.workspace
+.settings
+.buildpath
+.svn
