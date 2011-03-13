@@ -39,6 +39,7 @@ require_once dirname(__FILE__) . "/Roster.php";
  * @author	 Stephan Wentz <JID: stephan@jabber.wentz.it>
  * @author	 Michael Garvin <JID: gar@netflint.net>
  * @copyright  2008 Nathanael C. Fritz
+ * @version	$Id$
  */
 class XMPPHP_XMPP extends XMPPHP_XMLStream {
 	/**
@@ -175,7 +176,7 @@ class XMPPHP_XMPP extends XMPPHP_XMLStream {
 		$out .= "<body>$body</body>";
 		if($payload) $out .= $payload;
 		$out .= "</message>";
-        $this->log->log($out, XMPPHP_Log::LEVEL_INFO)	;	
+        $this->log->log($out, XMPPHP_Log::LEVEL_VERBOSE)	;	
 		$this->send($out);
 	}
 
@@ -207,7 +208,10 @@ class XMPPHP_XMPP extends XMPPHP_XMLStream {
 		
 		$this->send($out);
 	}
-	
+	/**
+     * Send a ping to the server
+     *
+     */
 	public function ping() {
 		$id = $this->getId();
 	    $out = '<iq type="get" id="' . $id . '">	<ping xmlns="urn:xmpp:ping"/></iq>';
@@ -255,7 +259,7 @@ class XMPPHP_XMPP extends XMPPHP_XMLStream {
 		$payload['status'] = (isset($xml->sub('status')->data)) ? $xml->sub('status')->data : '';
 		$payload['priority'] = (isset($xml->sub('priority')->data)) ? intval($xml->sub('priority')->data) : 0;
 		$payload['xml'] = $xml;
-		
+		// psmith: resolve username, for MUC presences, this is not in the 'to' attr.
 		if ($xml->hasSub('x',  'http://jabber.org/protocol/muc#user')) {
 			$x = $xml->sub('x', null,  'http://jabber.org/protocol/muc#user');
 		    if (isset($x->sub('item')->attrs['jid'])) {

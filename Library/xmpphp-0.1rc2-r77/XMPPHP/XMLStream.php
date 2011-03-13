@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/Log.php';
  * @author	 Stephan Wentz <JID: stephan@jabber.wentz.it>
  * @author	 Michael Garvin <JID: gar@netflint.net>
  * @copyright  2008 Nathanael C. Fritz
+ * @version	$Id$
  */
 class XMPPHP_XMLStream {
 	/**
@@ -458,14 +459,14 @@ class XMPPHP_XMLStream {
 	 * @return string
 	 */
 	public function processUntil($event, $timeout=-1) {
-//LS mem leak hack - Lukasz A. Grabowski - www.lucas.net.pl
-                $this->until = null; //must null for garbage
-                unset($this->until); //then unset
-                $this->until = array(); //and create new
-                $this->until_payload = null; //must null for garbage
-                unset($this->until_payload); //then unset
-                $this->until_payload = array(); //and create new
-//LS: END mem lead hack
+        //LS mem leak hack - Lukasz A. Grabowski - www.lucas.net.pl
+        $this->until = null; //must null for garbage
+        unset($this->until); //then unset
+        $this->until = array(); //and create new
+        $this->until_payload = null; //must null for garbage
+        unset($this->until_payload); //then unset
+        $this->until_payload = array(); //and create new
+        //LS: END mem lead hack
 		$start = time();
 		if(!is_array($event)) $event = array($event);
 		$this->until[] = $event;
@@ -477,6 +478,7 @@ class XMPPHP_XMLStream {
 
 		while(!$this->disconnected and $this->until_count[$event_key] < 1 and (time() - $start < $timeout or $timeout == -1)) {
 			$this->__process();
+            // psmith: release the CPU for a short break.
 			usleep (20000);
 		}
 
