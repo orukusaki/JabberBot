@@ -41,11 +41,3 @@ function jabberBotAutoload($strClassName)
     }
 }
 spl_autoload_register('jabberBotAutoload');
-// Include Pugins
-$baseDir = dirname(__FILE__) . '/../Plugins/';
-foreach (scandir($baseDir) as $filename) {
-    if (preg_match('/^(.*).class.php/', $filename)) {
-        require_once ($baseDir . $filename);
-    }
-}
-unset($baseDir);

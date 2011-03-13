@@ -92,8 +92,6 @@ class JabberBot_Command_Admin extends JabberBot_Command
 
         case 'restart':
             $this->checkAcl($message->getUsername(), '/bot/admin/restart');
-            $message->reply($this->_bot->getRandomQuote('denied'));
-            return;
             eval(die(exec(dirname(__FILE__) . '/../../../jabberbot restart')));
             break;
 

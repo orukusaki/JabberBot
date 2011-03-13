@@ -30,15 +30,13 @@ $pid = pcntl_fork();
 if ($pid) {
     echo 'Jabber Bot started.  Process pid is ' . $pid . PHP_EOL . "\n";
     exit();
-} else {
-    //     pcntl_signal(SIGTERM, "handleTerminate");
-    
 }
+
 $bot = new JabberBot_Bot();
-$bot->run();
-function handleTerminate($sig)
-{
-    global $bot;
-    //TODO: impliment this method in Bot.class.php
-    $bot->terminate();
+
+while (!$bot->isDisconnected()) {
+    $bot->readInbound();
+    $bot->checkMessageQueue();
+    $bot->pingIfNecessary();
+    sleep(2);    
 }

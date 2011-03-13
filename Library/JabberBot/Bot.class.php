@@ -115,7 +115,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
             $conf['bot']['loglevel']
         );
         
-        $this->addEventHandler('reconnect', 'handle_reconnect', $this);
+        $this->addEventHandler('reconnect', 'handleReconnect', $this);
         $this->useEncryption(($server['ssl'] == 'true'));
         // Set up Commands
         $commandBase = dirname(__FILE__) . '/Command/';
@@ -146,6 +146,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
         }
         // Announce our presence for private chats
         $this->presence();
+        $this->resetPing();
     }
     
     /**
@@ -282,7 +283,13 @@ class JabberBot_Bot extends XMPPHP_XMPP
         $message = null;
         unset($message);
     }
-    public function handle_reconnect()
+    /**
+     * Handle Reconnect Event
+     * 
+     * If we reconnected becasuse of a server timeout, ensure that room presences are restored
+     * @return void
+     */
+    public function handleReconnect()
     {
         $this->processUntil('session_start');
         $rooms = $this->rooms;
@@ -293,69 +300,82 @@ class JabberBot_Bot extends XMPPHP_XMPP
         }
         $this->presence();
     }
+    
+    /**
+     * Reset Ping timeout
+     *
+     * Resets the time since the last message was sent or received. 
+     */
     public function resetPing()
     {
         $this->lastPing = time();
     }
-    public function pingNeeded()
-    {
-        return (($this->pingInverval != 0) && ($this->lastPing + $this->pingInverval < time()));
-    }
+    
     /**
-     * Run in a loop.
+     * Ping If Necessary
+     * 
+     * Sends a ping mesasge to the server if there has not been a message
+     * sent or received since the timeout interval.
+     *  
+     * @return void 
+     */
+    public function pingIfNecessary() {
+        if (
+            $this->pingInverval != 0 
+            && $this->lastPing + $this->pingInverval < time()
+            ) {
+            $this->ping();
+            $this->resetPing();
+        }
+    }
+    
+    /**
+     * Check Inbound messages
      *
-     * Runs in a loop until a disconnection event occurs.  Receives inbound messages and processes them.
-     * Checks the outbound message queue and sends any outstanding messages.
-     *
+     * Receives inbound messages and processes them.
      * @return void
      */
-    public function run()
-    {
-        $this->resetPing();
-        while (!$this->isDisconnected()) {
-            $payloads = $this->processUntil(array('message', 'presence', 'end_stream', 'session_start', 'vcard'), 2);
-            foreach ($payloads as $event) {
-                $this->resetPing();
-                $pl = $event[1];
-                switch ($event[0]) {
-                case 'message':
-                    $this->_processMessage($pl);
-                    break;
+    public function readInbound() {
+        $payloads = $this->processUntil(array('message', 'presence', 'end_stream', 'session_start', 'vcard'), 2);
+        foreach ($payloads as $event) {
+            $this->resetPing();
+            $pl = $event[1];
+            switch ($event[0]) {
+            case 'message':
+                $this->_processMessage($pl);
+                break;
 
-                case 'presence':
-                    print "Presence: {$pl['from']} [{$pl['show']}] {$pl['status']}\n";
-                    break;
+            case 'presence':
+                $this->log("Presence: {$pl['from']} [{$pl['show']}] {$pl['status']}", XMPPHP_Log::LEVEL_INFO);
+                break;
 
-                case 'session_start':
-                    print "Session Start\n";
-                    $this->getRoster();
-                    $this->presence($this->getRandomQuote('status'));
-                    break;
-                }
+            case 'session_start':
+                print "Session Start\n";
+                $this->getRoster();
+                $this->presence($this->getRandomQuote('status'));
+                break;
             }
-            // check message queue
-            $arrQueue = $this->db->checkMessageQueue();
-            foreach ($arrQueue as $queuedMessage) {
-                $this->resetPing();
-                $this->db->markMessageSent(array('intMessageQueueId' => $queuedMessage['intMessageQueueId']));
-                if ($queuedMessage['strType'] == 'groupchat') {
-                    $this->sendToRoom($queuedMessage['strTo'], $queuedMessage['strMessage']);
-                } elseif ($queuedMessage['strType'] == 'chat') {
-                    $this->message($queuedMessage['strTo'] . '@' . $this->host, $queuedMessage['strMessage'], 'chat');
-                }
+        }
+    }
+
+    /**
+     * Check oubound message queue
+     * 
+     * Checks the database for messages queued up to send.
+     * @return void
+     */
+    public function checkMessageQueue() {
+        $arrQueue = $this->db->checkMessageQueue();
+        foreach ($arrQueue as $queuedMessage) {
+            $this->resetPing();
+            $this->db->markMessageSent(array('intMessageQueueId' => $queuedMessage['intMessageQueueId']));
+            if ($queuedMessage['strType'] == 'groupchat') {
+                $this->sendToRoom($queuedMessage['strTo'], $queuedMessage['strMessage']);
+            } elseif ($queuedMessage['strType'] == 'chat') {
+                $this->message($queuedMessage['strTo'] . '@' . $this->host, $queuedMessage['strMessage'], 'chat');
             }
-            unset($arrQueue);
-            // Ping
-            if ($this->pingNeeded()) {
-                $this->ping();
-                $this->resetPing();
-            }
-            /* PHP 5.3 only.
-            gc_collect_cycles(); 
-            */
-            sleep(2);
-        } // end big loop
-        
-    } // end function run
+        }
+        unset($arrQueue);
+    }
     
 }
