@@ -346,7 +346,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
                 break;
 
             case 'presence':
-                $this->log("Presence: {$pl['from']} [{$pl['show']}] {$pl['status']}", XMPPHP_Log::LEVEL_INFO);
+                $this->log->log("Presence: {$pl['from']} [{$pl['show']}] {$pl['status']}", XMPPHP_Log::LEVEL_INFO);
                 break;
 
             case 'session_start':

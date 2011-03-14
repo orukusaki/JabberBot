@@ -25,7 +25,7 @@
     
     <target name="php-documentor">
         <exec executable="phpdoc" dir="${basedir}/" logerror="on">
-            <arg line="--title '${ant.project.name}' -t ${basedir}/Build/docs -d ${basedir}/Api,${basedir}/Library/JabberBot,${basedir}/Scripts"/>
+            <arg line="--title '${ant.project.name}' -t ${basedir}/Build/docs -d ${basedir}/Public,${basedir}/Library/JabberBot,${basedir}/Scripts"/>
         </exec>
     </target>
 
