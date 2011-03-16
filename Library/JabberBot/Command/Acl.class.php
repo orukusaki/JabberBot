@@ -102,7 +102,9 @@ class JabberBot_Command_Acl extends JabberBot_Command
             }
             $this->checkAcl($message->getUsername(), '/acl/add' . $position);
             try {
-                $this->_db->insertRule(array('position' => $position, 'allow' => $directive, 'property' => $property, 'value' => $value));
+                $this->_db->insertRule(
+                    array('position' => $position, 'allow' => $directive, 'property' => $property, 'value' => $value)
+                );
             }
             catch(Exception $e) {
                 $message->reply('Db Error :( ' . PHP_EOL . $e->getMessage());
@@ -142,9 +144,10 @@ class JabberBot_Command_Acl extends JabberBot_Command
                 return;
             }
             $result = $this->_bot->acl->check($username, $resource);
-            $message->reply('Check result is: ' . (($result) ? 'allow' : 'deny') . PHP_EOL 
-                            . 'Trace:' . PHP_EOL . $this->_bot->acl->trace
-                      );
+            $message->reply(
+                'Check result is: ' . (($result) ? 'allow' : 'deny') . PHP_EOL 
+                . 'Trace:' . PHP_EOL . $this->_bot->acl->trace
+            );
             break;
 
         case 'help':

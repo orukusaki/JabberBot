@@ -35,7 +35,10 @@ class GrammaCheckTest extends PHPUnit_Framework_TestCase
         $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
         $message->body = '*grammar off';
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))->will($this->returnValue(false));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))
+                       ->will($this->returnValue(false));
         $this->command->run($message);
         $this->assertAttributeEquals(true, '_bolActive', $this->command);
     }
@@ -45,7 +48,10 @@ class GrammaCheckTest extends PHPUnit_Framework_TestCase
         $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
         $message->body = '*grammar off';
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))->will($this->returnValue(true));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))
+                       ->will($this->returnValue(true));
         $message->expects($this->once())->method('reply')->with('Grammar check disabled');
         $this->command->run($message);
         $this->assertAttributeEquals(false, '_bolActive', $this->command);
@@ -61,7 +67,10 @@ class GrammaCheckTest extends PHPUnit_Framework_TestCase
         $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
         $message->body = '*grammar on';
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))->will($this->returnValue(false));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))
+                       ->will($this->returnValue(false));
         $this->command->run($message);
     }
     public function testGrammarOnAccessGranted()
@@ -70,7 +79,10 @@ class GrammaCheckTest extends PHPUnit_Framework_TestCase
         $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
         $message->body = '*grammar on';
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))->will($this->returnValue(true));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))
+                       ->will($this->returnValue(true));
         $message->expects($this->once())->method('reply')->with('Grammar check activated');
         $this->command->run($message);
         $this->assertAttributeEquals(true, '_bolActive', $this->command);
@@ -95,7 +107,10 @@ class GrammaCheckTest extends PHPUnit_Framework_TestCase
         $message->body = '*grammar';
         $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))->will($this->returnValue(true));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/grammar'))
+                       ->will($this->returnValue(true));
         $message->expects($this->once())->method('reply')->with('Grammar check is on');
         $this->command->run($message);
     }
