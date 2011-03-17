@@ -278,6 +278,9 @@ class JabberBot_Bot extends XMPPHP_XMPP
                     $this->log->log($e->trace, XMPPHP_Log::LEVEL_VERBOSE);
                     $message->reply($this->getRandomQuote('denied'));
                 }
+                catch (Exception $e) {
+                	$message->reply($e->getMessage());
+                }
             }
         }
         $message = null;
