@@ -32,7 +32,7 @@
  * @copyright 2011 Plusnet
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
  */
-class RemindTest extends PHPUnit_Framework_TestCase
+class JabberBot_Command_RemindTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Set up mock objects
