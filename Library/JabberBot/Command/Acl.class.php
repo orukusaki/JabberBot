@@ -119,7 +119,7 @@ class JabberBot_Command_Acl extends JabberBot_Command
                 $message->reply('Usage: *acl rm <id>. Use *acl view to get the id');
                 return;
             }
-            $this->checkAcl($message->getUsername(), '/acl/rm' . $position);
+            $this->checkAcl($message->getUsername(), '/acl/rm' . $words[2]);
             try {
                 $this->_db->deleteRule(array('id' => $words[2]));
             }
@@ -145,7 +145,7 @@ class JabberBot_Command_Acl extends JabberBot_Command
             }
             $result = $this->_bot->acl->check($username, $resource);
             $message->reply(
-                'Check result is: ' . (($result) ? 'allow' : 'deny') . PHP_EOL 
+                'Check result is: ' . (($result) ? 'allow' : 'deny') . PHP_EOL
                 . 'Trace:' . PHP_EOL . $this->_bot->acl->trace
             );
             break;
