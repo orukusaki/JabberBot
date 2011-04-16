@@ -278,6 +278,9 @@ class JabberBot_Bot extends XMPPHP_XMPP
                     $this->log->log($e->trace, XMPPHP_Log::LEVEL_VERBOSE);
                     $message->reply($this->getRandomQuote('denied'));
                 }
+                catch (Exception $e) {
+                	$message->reply($e->getMessage());
+                }
             }
         }
         $message = null;
@@ -319,7 +322,8 @@ class JabberBot_Bot extends XMPPHP_XMPP
      *  
      * @return void 
      */
-    public function pingIfNecessary() {
+    public function pingIfNecessary() 
+    {
         if (
             $this->pingInverval != 0 
             && $this->lastPing + $this->pingInverval < time()
@@ -335,7 +339,8 @@ class JabberBot_Bot extends XMPPHP_XMPP
      * Receives inbound messages and processes them.
      * @return void
      */
-    public function readInbound() {
+    public function readInbound() 
+    {
         $payloads = $this->processUntil(array('message', 'presence', 'end_stream', 'session_start', 'vcard'), 2);
         foreach ($payloads as $event) {
             $this->resetPing();
@@ -346,7 +351,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
                 break;
 
             case 'presence':
-                $this->log("Presence: {$pl['from']} [{$pl['show']}] {$pl['status']}", XMPPHP_Log::LEVEL_INFO);
+                $this->log->log("Presence: {$pl['from']} [{$pl['show']}] {$pl['status']}", XMPPHP_Log::LEVEL_INFO);
                 break;
 
             case 'session_start':
@@ -363,7 +368,8 @@ class JabberBot_Bot extends XMPPHP_XMPP
      * Checks the database for messages queued up to send.
      * @return void
      */
-    public function checkMessageQueue() {
+    public function checkMessageQueue() 
+    {
         $arrQueue = $this->db->checkMessageQueue();
         foreach ($arrQueue as $queuedMessage) {
             $this->resetPing();

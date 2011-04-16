@@ -32,7 +32,9 @@ class ListTest extends PHPUnit_Framework_TestCase
         $this->bot->arrCommands = array($cmd1, $cmd2);
         $message = $this->getMockBuilder('JabberBot_Message')->disableOriginalConstructor()->getMock();
         $message->body = '*list';
-        $message->expects($this->once())->method('reply')->with('Available Commands: ' . PHP_EOL . 'command1' . PHP_EOL . 'command2' . PHP_EOL);
+        $message->expects($this->once())
+                ->method('reply')
+                ->with('Available Commands: ' . PHP_EOL . 'command1' . PHP_EOL . 'command2' . PHP_EOL);
         $this->command->run($message);
     }
 }

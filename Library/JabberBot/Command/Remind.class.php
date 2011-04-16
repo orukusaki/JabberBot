@@ -61,19 +61,21 @@ class JabberBot_Command_Remind extends JabberBot_Command
         }
         $uxtTime = strtotime($matches[1]);
         if (!$uxtTime) {
-            $message->reply('Couldn\'t figure out when you want the reminder.  ' 
-                            . 'Check http://www.php.net/manual/en/datetime.formats.php'
-                           );
+            $message->reply(
+                'Couldn\'t figure out when you want the reminder.  ' 
+                . 'Check http://www.php.net/manual/en/datetime.formats.php'
+            );
             return;
         }
         $senderSplit = explode('@', $message->getReplyAddress());
-        $this->_bot->db->createQueuedMessage(array('to' => $senderSplit[0], 
-                                                   'type' => $message->type, 
-                                                   'due' => date('Y-m-d H:i', $uxtTime), 
-                                                   'message' => 'Reminder set by ' 
-                                                   . $message->getUsername() . ': ' . $matches[2]
-                                                  )
-                                            );
+        $this->_bot->db->createQueuedMessage(
+            array(
+                'to' => $senderSplit[0], 
+                 'type' => $message->type, 
+                 'due' => date('Y-m-d H:i', $uxtTime), 
+                 'message' => 'Reminder set by ' . $message->getUsername() . ': ' . $matches[2]
+           )
+        );
         $message->reply('Reminder set for ' . date('Y-m-d H:i ', $uxtTime));
     }
     /**

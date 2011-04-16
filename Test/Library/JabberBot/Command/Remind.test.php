@@ -32,7 +32,7 @@
  * @copyright 2011 Plusnet
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
  */
-class RemindTest extends PHPUnit_Framework_TestCase
+class JabberBot_Command_RemindTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Set up mock objects
@@ -82,7 +82,10 @@ class RemindTest extends PHPUnit_Framework_TestCase
         $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
         $message->body = '*remind tomorrow, do something devious';
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))->will($this->returnValue(false));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))
+                       ->will($this->returnValue(false));
         $this->command->run($message);
     }
     /**
@@ -92,10 +95,17 @@ class RemindTest extends PHPUnit_Framework_TestCase
     {
         $message = $this->getMockBuilder('JabberBot_Message')->disableOriginalConstructor()->getMock();
         $message->body = '*remind me some stuff';
-        $message->expects($this->once())->method('reply')->with('Couldn\'t understand that, try *remind <when>, <message> (don\'t forget the comma)');
-        $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
+        $message->expects($this->once())
+                ->method('reply')
+                ->with('Couldn\'t understand that, try *remind <when>, <message> (don\'t forget the comma)');
+        $message->expects($this->once())
+                ->method('getUsername')
+                ->will($this->returnValue('psmith'));
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))->will($this->returnValue(true));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))
+                       ->will($this->returnValue(true));
         $this->command->run($message);
     }
     /**
@@ -105,10 +115,19 @@ class RemindTest extends PHPUnit_Framework_TestCase
     {
         $message = $this->getMockBuilder('JabberBot_Message')->disableOriginalConstructor()->getMock();
         $message->body = '*remind blah, do some stuff';
-        $message->expects($this->once())->method('reply')->with('Couldn\'t figure out when you want the reminder.  Check http://www.php.net/manual/en/datetime.formats.php');
-        $message->expects($this->once())->method('getUsername')->will($this->returnValue('psmith'));
+        $message->expects($this->once())
+                ->method('reply')
+                ->with(
+                    'Couldn\'t figure out when you want the reminder. '
+                    .' Check http://www.php.net/manual/en/datetime.formats.php'
+                );
+        $message->expects($this->once())
+        ->method('getUsername')->will($this->returnValue('psmith'));
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))->will($this->returnValue(true));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))
+                       ->will($this->returnValue(true));
         $this->command->run($message);
     }
     /**
@@ -126,8 +145,13 @@ class RemindTest extends PHPUnit_Framework_TestCase
         $message->expects($this->once())->method('getReplyAddress')->will($this->returnValue($to));
         $message->expects($this->exactly(2))->method('getUsername')->will($this->returnValue('psmith'));
         $this->bot->acl = $this->getMockBuilder('JabberBot_Acl')->getMock();
-        $this->bot->acl->expects($this->once())->method('check')->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))->will($this->returnValue(true));
-        $message->expects($this->once())->method('reply')->with('Reminder set for ' . date('Y-m-d H:i ', strtotime($time)));
+        $this->bot->acl->expects($this->once())
+                       ->method('check')
+                       ->with($this->equalTo('psmith'), $this->equalTo('/bot/remind'))
+                       ->will($this->returnValue(true));
+        $message->expects($this->once())
+                ->method('reply')
+                ->with('Reminder set for ' . date('Y-m-d H:i ', strtotime($time)));
         $this->command->run($message);
         $dataInserted = $this->bot->db->getData();
         $this->assertEquals(substr($to, 0, strpos($to, '@')), $dataInserted['to']);
@@ -138,7 +162,14 @@ class RemindTest extends PHPUnit_Framework_TestCase
     }
     public function dataProvider()
     {
-        return array(array('now', 'Do something really important', 'agroup@someserver.com', 'groupchat'), array('tomorrow', 'Do something, with a comm)a', 'psmith@someserver.com', 'chat'), array('tomorrow 9am', 'Do something, with <b>tags</b>', 'agroup@someserver.com', 'groupchat'), array('tomorrow 18:00', 'Do something with SQL injection, like \';drop table tblAcl;', 'psmith@someserver.com', 'chat'),);
+        return array(
+            array('now', 'Do something really important', 'agroup@someserver.com', 'groupchat'), 
+            array('tomorrow', 'Do something, with a comm)a', 'psmith@someserver.com', 'chat'), 
+            array('tomorrow 9am', 'Do something, with <b>tags</b>', 'agroup@someserver.com', 'groupchat'), 
+            array(
+                'tomorrow 18:00', 'Do something with SQL injection, like \';drop table tblAcl;', 
+                'psmith@someserver.com', 'chat'),
+        );
     }
 }
 class MockReminderDb

@@ -53,6 +53,10 @@ class JabberBot_Command_Admin extends JabberBot_Command
     public function run($message)
     {
         $words = explode(' ', $message->body);
+        if (!isset($words[1])) {
+        	$message->reply("*admin <command>\ncommands:\njoin <room>\nleave <room>\nquit");
+        	return;
+        }
         switch ($words[1]) {
         case 'join':
             if ($words[2]) {

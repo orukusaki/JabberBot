@@ -24,6 +24,7 @@
  * @copyright 2011 Plusnet
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
  */
+
 /**
  * Autoloader
  *
@@ -40,4 +41,19 @@ function jabberBotAutoload($strClassName)
         require_once (dirname(__FILE__) . '/../Library/' . $strClassName . '.php');
     }
 }
+
+/**
+ * Standard Error Handler - throw an ErrorException on any error
+ * 
+ * @param $errno
+ * @param $errstr
+ * @param $errfile
+ * @param $errline
+ */
+function jabberBotErrorHandler($errno, $errstr, $errfile, $errline ) 
+{
+    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+}
+
+set_error_handler("jabberBotErrorHandler");
 spl_autoload_register('jabberBotAutoload');

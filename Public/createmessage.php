@@ -31,10 +31,13 @@ if (isset($_REQUEST['to'])
  && in_array($_REQUEST['type'], array('chat', 'groupchat')) 
  && isset($_REQUEST['message'])
 ) {
-    $db->createMessage(array('to' => stripslashes($_REQUEST['to']), 
-                             'type' => stripslashes($_REQUEST['type']), 
-                             'message' => stripslashes($_REQUEST['message']),
-    ));
+    $db->createMessage(
+        array(
+            'to' => stripslashes($_REQUEST['to']), 
+            'type' => stripslashes($_REQUEST['type']), 
+            'message' => stripslashes($_REQUEST['message']),
+        )
+    );
     echo "Success";
 } else {
     echo "Failure";

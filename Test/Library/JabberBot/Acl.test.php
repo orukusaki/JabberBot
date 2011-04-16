@@ -39,7 +39,17 @@ class AclTest extends PHPUnit_Framework_TestCase
      */
     public function provider()
     {
-        return array(array('/default/thing', 'unknown', false), array('/bot', 'unknown', false), array('/bot', 'normaluser', true), array('/bot/admin', 'normaluser', false), array('/bot/admin/quit', 'normaluser', false), array('/bot/admin', 'adminuser', true), array('/bot/admin/quit', 'adminuser', true), array('/bot/admin/quit', 'unknown', false), array('/bot/somecommand', 'unknown', false),);
+        return array(
+            array('/default/thing', 'unknown', false), 
+            array('/bot', 'unknown', false), 
+            array('/bot', 'normaluser', true), 
+            array('/bot/admin', 'normaluser', false), 
+            array('/bot/admin/quit', 'normaluser', false), 
+            array('/bot/admin', 'adminuser', true), 
+            array('/bot/admin/quit', 'adminuser', true), 
+            array('/bot/admin/quit', 'unknown', false), 
+            array('/bot/somecommand', 'unknown', false),
+        );
     }
     /**
      * Set up mock objects
@@ -77,26 +87,47 @@ class MockDb
      * Mock User Data
      * @var array
      */
-    public $userData = array(array('username' => 'unknown', 'return' => array(array('level' => 0,))), array('username' => 'normaluser', 'return' => array(array('level' => 2,))), array('username' => 'adminuser', 'return' => array(array('level' => 3,))),);
+    public $userData = array(
+        array(
+            'username' => 'unknown', 
+            'return' => array(
+                array('level' => 0,)
+            )
+         ), 
+         array(
+            'username' => 'normaluser', 
+            'return' => array(
+                array('level' => 2,)
+            )
+        ), 
+        array(
+            'username' => 'adminuser', 
+            'return' => array(
+                array('level' => 3,)
+            )
+        ),
+    );
     /**
      *
      * Mock ACL data
      * @var array
      */
     public $aclData = array(
-    /*
-     array('strPosition' => '/',
-           'return' => array(
-               array(
-                   'property' => 'any',
-                   'fnName'   => 'checkAny',
-                   'allow'    => 1,
-                   'value'    => null, 
-                ),
-           ),
-     ),
-    */
-    array('strPosition' => '/bot', 'return' => array(array('property' => 'level', 'fnName' => 'checkLevel', 'allow' => 1, 'value' => 2,), array('property' => 'any', 'fnName' => 'checkAny', 'allow' => 0, 'value' => null,),)), array('strPosition' => '/bot/admin', 'return' => array(array('property' => 'uname', 'fnName' => 'checkUname', 'allow' => 1, 'value' => 'adminuser',), array('property' => 'any', 'fnName' => 'checkAny', 'allow' => 0, 'value' => null,),),),);
+        array(
+         'strPosition' => '/bot', 
+            'return' => array(
+                array('property' => 'level', 'fnName' => 'checkLevel', 'allow' => 1, 'value' => 2,), 
+                array('property' => 'any', 'fnName' => 'checkAny', 'allow' => 0, 'value' => null,),
+            )
+        ), 
+        array(
+            'strPosition' => '/bot/admin', 
+            'return' => array(
+                array('property' => 'uname', 'fnName' => 'checkUname', 'allow' => 1, 'value' => 'adminuser',),
+                array('property' => 'any', 'fnName' => 'checkAny', 'allow' => 0, 'value' => null,),
+            ),
+        ),
+    );
     /**
      * Mock ACL rules method
      *
