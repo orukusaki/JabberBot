@@ -138,16 +138,18 @@ class JabberBot_Acl
      * The rule applies to the user because they are a member of a group
      *
      * @param  string  $username Username being tested
-     * @param  string  $value    The Group ID
+     * @param  string  $value    The Group Handle
      * @return boolean Test result
      */
-    private function _checkGroup($username, $value)
+    private function _checkGroup($username, $handle)
     {
-        // @codeCoverageIgnoreStart
-        // TODO: impliment
+        $usersInGroup = $this->_userdb->getGroupMembersByHandle($handle);
+        foreach ($usersInGroup as $member) {
+            if ($member['username'] == $username) {
+                return true;
+            }
+        }
         return false;
-        // @codeCoverageIgnoreEnd
-        
     }
     
     /**

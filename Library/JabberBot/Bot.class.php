@@ -350,7 +350,6 @@ class JabberBot_Bot extends XMPPHP_XMPP
                 break;
 
             case 'session_start':
-                print "Session Start\n";
                 $this->getRoster();
                 $this->presence($this->getRandomQuote('status'));
                 break;

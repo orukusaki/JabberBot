@@ -28,7 +28,7 @@ require_once ('Bootstrap.inc.php');
 declare(ticks = 1);
 $pid = pcntl_fork();
 if ($pid) {
-    echo 'Jabber Bot started.  Process pid is ' . $pid . PHP_EOL . "\n";
+    echo 'Jabber Bot started.  Process pid is ' . $pid . PHP_EOL;
     exit();
 }
 
