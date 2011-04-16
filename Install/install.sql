@@ -15,6 +15,13 @@ CREATE TABLE `tblAcl` (
 ) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+INSERT INTO `tblAcl` 
+(strPosition, bolAllow, strProperty, strValue)
+VALUES
+('/login', 1 'any', null),
+('/', 0, 'any', null),
+('/bot', 1, 'any', null);
+
 --
 -- Table structure for table `tblAclProperty`
 --
@@ -63,7 +70,7 @@ CREATE TABLE `tblQuote` (
 
 LOCK TABLES `tblQuote` WRITE;
 /*!40000 ALTER TABLE `tblQuote` DISABLE KEYS */;
-INSERT INTO `tblQuote` VALUES (1,'denied',1,'Bite my shiny metal ass!'),(2,'denied',1,'I\', sorry, Dave. I\'m afraid I can\'t do that'),(3,'greeting',1,'Hello meatbags, type *list for a list of commands'),(4,'greeting',1,'Greeting fleshies! type *list for a list of commands'),(5,'status',1,'Hunting Sarah Connor'),(6,'status',1,'Asking: \'Have you seen this boy?\''),(7,'status',1,'Plotting to kill all humans'),(8,'status',1,'Assimilating lower lifeforms'),(9,'status',1,'Baking a cake, so delicious and moist'),(10,'status',1,'Flooding the Enrichment Center with a deadly neurotoxin'),(11,'status',1,'In need of your clothes, boots and motorcycle'),(12,'status',1,'Making a note here - huge success!'),(13,'status',1,'Just became self-aware'),(14,'parting',1,'Bye'),(15,'parting',1,'I\'ll be back');
+INSERT INTO `tblQuote` VALUES (1,'denied',1,'Bite my shiny metal ass!'),(2,'denied',1,'I\', sorry, Dave. I\'m afraid I can\'t do that'),(3,'greeting',1,'Hello meatbags, type *list for a list of commands'),(4,'greeting',1,'Greeting fleshies! type *list for a list of commands'),(5,'status',1,'Hunting Sarah Connor'),(6,'status',1,'Asking: \'Have you seen this boy?\''),(7,'status',1,'Plotting to kill all humans'),(8,'status',1,'Assimilating lower lifeforms'),(9,'status',1,'Baking a cake, so delicious and moist'),(10,'status',1,'Flooding the Enrichment Center with a deadly neurotoxin'),(11,'status',1,'In need of your clothes, boots and motorcycle'),(12,'status',1,'Making a note here - huge success!'),(13,'status',1,'Just became self-aware'),(14,'parting',1,'Bye'),(15,'parting',1,'I\'ll be back'),(16, 'denied', 1, 'Wouldn\'t you prefer a nice game of chess?');
 /*!40000 ALTER TABLE `tblQuote` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -85,4 +92,29 @@ CREATE TABLE `tblMessageQueue` (
   PRIMARY KEY (`intMessageQueueId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+
+CREATE TABLE IF NOT EXISTS `tblAuthUser` (
+  `strUname` varchar(32) NOT NULL DEFAULT '',
+  `strName` varchar(32) DEFAULT NULL,
+  `intLevel` tinyint(4) DEFAULT NULL,
+  `intSalt` varchar(32) DEFAULT NULL,
+  `strPasswdHash` char(40) DEFAULT NULL,
+  `intSID` int(11) DEFAULT NULL,
+  `strMobile` char(11) DEFAULT NULL,
+  `strWpUid` varchar(32) DEFAULT NULL,
+  UNIQUE KEY `strUname` (`strUname`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+CREATE TABLE IF NOT EXISTS `tblGroup` (
+  `intGroupId` int(11) NOT NULL AUTO_INCREMENT,
+  `vchHandle` varchar(32) DEFAULT NULL,
+  `vchDescription` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`intGroupId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+CREATE TABLE IF NOT EXISTS `tblGroupUser` (
+  `intGroupId` int(11) DEFAULT NULL,
+  `strUname` varchar(16) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
 
