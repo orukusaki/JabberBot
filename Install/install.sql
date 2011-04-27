@@ -18,7 +18,7 @@ CREATE TABLE `tblAcl` (
 INSERT INTO `tblAcl` 
 (strPosition, bolAllow, strProperty, strValue)
 VALUES
-('/login', 1 'any', null),
+('/login', 1, 'any', null),
 ('/', 0, 'any', null),
 ('/bot', 1, 'any', null);
 
@@ -104,17 +104,17 @@ CREATE TABLE IF NOT EXISTS `tblAuthUser` (
   `strMobile` char(11) DEFAULT NULL,
   `strWpUid` varchar(32) DEFAULT NULL,
   UNIQUE KEY `strUname` (`strUname`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `tblGroup` (
   `intGroupId` int(11) NOT NULL AUTO_INCREMENT,
   `vchHandle` varchar(32) DEFAULT NULL,
   `vchDescription` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`intGroupId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `tblGroupUser` (
   `intGroupId` int(11) DEFAULT NULL,
   `strUname` varchar(16) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
