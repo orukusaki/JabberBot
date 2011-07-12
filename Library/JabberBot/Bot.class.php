@@ -111,8 +111,11 @@ class JabberBot_Bot extends XMPPHP_XMPP
         $this->rooms = array();
         $this->db = new JabberBot_Db('bot');
         $this->acl = new JabberBot_Acl();
-        $this->defaultRoom = (isset($conf['bot']['defaultroom'])) ? $conf['bot']['defaultroom'] : null;
-        $this->pingInverval = $conf['bot']['pinginterval'];
+        
+        $botConf = $this->_config->getValue('bot');
+        
+        $this->defaultRoom = (isset($botConf['defaultroom'])) ? $botConf['defaultroom'] : null;
+        $this->pingInverval = $botConf['pinginterval'];
 
         // Call parent constructor, and set variables
         parent::__construct(
@@ -123,7 +126,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
             $server['resource'], 
             null, 
             true, 
-            $conf['bot']['loglevel']
+            $botConf['loglevel']
         );
         
         $this->addEventHandler('reconnect', 'handleReconnect', $this);
