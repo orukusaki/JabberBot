@@ -398,4 +398,8 @@ class JabberBot_Bot extends XMPPHP_XMPP
     	return $this->_config;
     }
     
+    public function setConfig($config) {
+    	$this->_config = $config;
+    }
+    
 }

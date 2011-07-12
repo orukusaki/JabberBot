@@ -1,8 +1,8 @@
 <?php
 /**
-* Unit test for the Config class.
+* Unit test for JabberBot_Command_Remind
 *
-* Contains the Config class
+* Contains the RemindTest class
 *
 * Copyright (C) 2011  Plusnet
 *
@@ -25,41 +25,55 @@
 * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
 */
 /**
- * Unit test for Config class
+ * Unit test for JabberBot_Command_Remind
  *
  * @package   JabberBot
  * @author    Stuart Grimshaw <stuart.grimshaw@gmail.com>
  * @copyright 2011 Plusnet
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
  */
-class ConfigTest extends PHPUnit_Framework_TestCase
+class JabberBot_Command_JiraTest extends PHPUnit_Framework_TestCase
 {
-	/**
-	 * 
-	 * Config data for all the tests.
-	 * @var array
-	 */
-	private $_mock_config;
+	const MESSAGE1 = "Can you look at JIRA-182";
+	const MESSAGE2 = "Can you look at jira-182";
+	const MESSAGE3 = "Can you look at JIRA - 182";
 	
-	/**
-	 * 
-	 * Set up the mock data.
-	 */
+	const JIRA_URL = "http://jira.local/JIRA-182";
+	
 	public function setUp() {
+		// Create the config mock.
 		$this->_mock_config['port'] = "5222";
 		$this->_mock_config['ssl'] = false;
 		$this->_mock_config['resource'] = "Bendr";
 		
 		$this->_mock_config['pinginterval'] = 60;
-		# log level 0 (least info) to 4 (most info)
 		$this->_mock_config['loglevel'] = 3;
 		
-		$this->_mock_config['jira_host'] = "http://jira.local";
+		$this->_mock_config["jira"]['host'] = "http://jira.local/";
+				
+		$this->bot = $this->getMockBuilder('JabberBot_Bot')->disableOriginalConstructor()->getMock();
+		
+		$this->command = new JabberBot_Command_Jira($this->bot);		
 	}
 	
-	public function testConfigObjectIsCreated() {
-		$config = new JabberBot_Config($this->_mock_config);
+	public function testSearchFindsJiraTickets() {
+		$this->assertTrue($this->command->search(JabberBot_Command_JiraTest::MESSAGE1) == true);
+		$this->assertTrue($this->command->search(JabberBot_Command_JiraTest::MESSAGE2) == false);
+		$this->assertTrue($this->command->search(JabberBot_Command_JiraTest::MESSAGE3) == false);
+	} 
+	
+	public function testJiraURLIsCorrect() {
+		$message = $this->getMockBuilder('JabberBot_Message')->disableOriginalConstructor()->getMock();
+		$message->body = JabberBot_Command_JiraTest::MESSAGE1;
 		
-		$this->assertEquals($config->getValue("port"), "5222");
+		// Mock the getConfig call.
+		$config = new JabberBot_Config($this->_mock_config);
+		$this->bot->expects($this->once())
+						->method('getConfig')
+						->will($this->returnValue($config));
+		
+		$this->assertEquals(JabberBot_Command_JiraTest::JIRA_URL, $this->command->run($message));
 	}
+	
 }
+?>
