@@ -31,6 +31,9 @@
 *
 * Watches the channel for patterns that look like unlinked Jira issues & provides
 * a link to them.
+* 
+* Not a very complex class, but it does what it needs to for now, and that's provide a 
+* way to get at the info stored in the bot's config. 
 *
 * @package   JabberBot
 * @subpackage Command
@@ -46,7 +49,7 @@ class JabberBot_Config {
 	private $_config;
 	
 	public function __construct($config) {
-		$_config = $config;
+		$this->_config = $config;
 	}
 	
 	/**
@@ -56,7 +59,7 @@ class JabberBot_Config {
 	 * @return String
 	 */
 	public function getValue($key) {
-		return in_array($key, $this->_config) ? $this->_config[$key] : Null;
+		return isset($key, $this->_config) ? $this->_config[$key] : Null;
 	}
 }
 ?>
