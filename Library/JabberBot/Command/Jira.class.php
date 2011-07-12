@@ -60,7 +60,8 @@ class JabberBot_Command_Jira extends JabberBot_Command
 	{
 		$issue = preg_match(JabberBot_Command_Jira::re, $message->body, $matches);
 		$jiraConfig = $this->_bot->getConfig()->getValue("jira"); 
-		return $jiraConfig["host"] . $matches[0];
+
+		$message->reply($jiraConfig["host"] . $matches[0]);
 	}
 	
 	public function search($body)

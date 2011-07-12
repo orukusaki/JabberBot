@@ -72,7 +72,11 @@ class JabberBot_Command_JiraTest extends PHPUnit_Framework_TestCase
 						->method('getConfig')
 						->will($this->returnValue($config));
 		
-		$this->assertEquals(JabberBot_Command_JiraTest::JIRA_URL, $this->command->run($message));
+		$message->expects($this->once())
+						->method('reply')
+						->with(JabberBot_Command_JiraTest::JIRA_URL);
+		
+		$this->command->run($message);
 	}
 	
 }
