@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project name="JabberBot" basedir=".">
 
-   	<property file="Install/deploy.properties"/>
+       <property file="Install/deploy.properties"/>
 
-	<target name="check-config">
+    <target name="check-config">
         <echo>Checking for config files</echo>
         <available file="Config/JabberBot.ini" property="config-present"/>
     </target>
@@ -12,7 +12,8 @@
         <delete dir="${basedir}/Config" />
         <mkdir dir="${basedir}/Config" />
         <copy file="${basedir}/Install/JabberBot.ini" todir="${basedir}/Config" />
-        <copy file="${basedir}/Install/database.ini"  todir="${basedir}/Config" />	
+        <copy file="${basedir}/Install/database.ini"  todir="${basedir}/Config" />
+        <copy file="${basedir}/Install/deploy.properties.dist"  todir="${basedir}/Install/deploy.properties" />
     </target>
 
     <target name="clean" >
@@ -22,7 +23,7 @@
         <mkdir dir="${basedir}/Build/graph" />
         <mkdir dir="${basedir}/Build/docs" />
     </target>
-    
+
     <target name="php-documentor">
         <exec executable="phpdoc" dir="${basedir}/" logerror="on">
             <arg line="--title '${ant.project.name}' -t ${basedir}/Build/docs -d ${basedir}/Public,${basedir}/Library/JabberBot,${basedir}/Scripts"/>
@@ -50,39 +51,34 @@
             <arg line="${basedir}/" />
         </exec>
     </target>
-    
+
     <target name="deploy">
 
-      	<tar destfile="/tmp/JabberBot.tgz" 
+          <tar destfile="/tmp/JabberBot.tgz"
            compression="gzip"
            basedir="${basedir}"
-           excludes="Config/**, Build/**, .**, Test/**">
-      
+           excludes="Build/**, .**, Test/**, Install/**">
+
       </tar>
       <exec executable="scp" failonerror="true">
-      	<arg line="/tmp/JabberBot.tgz" />
-      	<arg line="${deploy.user}@${deploy.host}:/tmp/JabberBot.tgz" />
+          <arg line="/tmp/JabberBot.tgz" />
+          <arg line="${deploy.user}@${deploy.host}:/tmp/JabberBot.tgz" />
       </exec>
-      
+
       <exec executable="ssh" failonerror="true">
-      	<arg line="${deploy.user}@${deploy.host}" />
-      	<arg line="rm -rf ${deploy.basedir}; mkdir ${deploy.basedir}; tar -xzf /tmp/JabberBot.tgz -C ${deploy.basedir};" />
+          <arg line="${deploy.user}@${deploy.host}" />
+          <arg line="rm -rf ${deploy.basedir};
+           mkdir ${deploy.basedir};
+           tar -xpzf /tmp/JabberBot.tgz -C ${deploy.basedir};
+           mkdir ${deploy.basedir}/Log;
+           cd ${deploy.basedir}; 
+           chmod +x jabberbot;
+           ./jabberbot restart;
+           " />
       </exec>
-      
-      <!--
-      <scp file="/tmp/JabberBot.tgz"
-           todir="${deploy.user}@${deploy.host}:/tmp" 
-           passphrase="${deploy.passphrase}"
-           password="${deploy.password}"/>
-      
-      <sshexec host="${deploy.host}"
-               username="{$deploy.user}"
-               password="${deploy.password}"
-               command="tar -xzf /tmp/JabberBot.tgz -C ${deploy.basedir}" />
-               -->
     </target>
-    	
+
     <target name="install" depends="copy-config,php-documentor" />
     <target name="review" depends="clean,phpunit,php-documentor,php-codesniffer" />
 
-</project> 
+</project>
