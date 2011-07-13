@@ -36,7 +36,7 @@
  * @see       References to other sections (if any)...
  */
 class JabberBot_Bot extends XMPPHP_XMPP
-{
+{	
     /**
      * Overriding protected property
      * @var    array
@@ -87,6 +87,13 @@ class JabberBot_Bot extends XMPPHP_XMPP
     public $lastPing = 0;
     
     /**
+     * 
+     * Holds the config for the bot.
+     * @var JabberBot_Config
+     */
+    private $_config;
+    
+    /**
      * Constructor
      *
      * Creates connection to the XMPP server, and loads all command classes.
@@ -97,12 +104,19 @@ class JabberBot_Bot extends XMPPHP_XMPP
     {
         // Load config
         $conf = parse_ini_file(dirname(__FILE__) . '/../../Config/JabberBot.ini', true);
-        $server = $conf['server'];
+        
+        $this->_config = new JabberBot_Config($conf);
+        
+        $server = $this->_config->getValue('server');
         $this->rooms = array();
         $this->db = new JabberBot_Db('bot');
         $this->acl = new JabberBot_Acl();
-        $this->defaultRoom = (isset($conf['bot']['defaultroom'])) ? $conf['bot']['defaultroom'] : null;
-        $this->pingInverval = $conf['bot']['pinginterval'];
+        
+        $botConf = $this->_config->getValue('bot');
+        
+        $this->defaultRoom = (isset($botConf['defaultroom'])) ? $botConf['defaultroom'] : null;
+        $this->pingInverval = $botConf['pinginterval'];
+
         // Call parent constructor, and set variables
         parent::__construct(
             $server['host'], 
@@ -112,7 +126,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
             $server['resource'], 
             null, 
             true, 
-            $conf['bot']['loglevel']
+            $botConf['loglevel']
         );
         
         $this->addEventHandler('reconnect', 'handleReconnect', $this);
@@ -381,6 +395,14 @@ class JabberBot_Bot extends XMPPHP_XMPP
             }
         }
         unset($arrQueue);
+    }
+    
+    public function getConfig() {
+    	return $this->_config;
+    }
+    
+    public function setConfig($config) {
+    	$this->_config = $config;
     }
     
 }
