@@ -47,28 +47,34 @@ class JabberBot_Db
 {
     /**
      * Array containing db connection details
-     * @var    array
+     *
+     * @var array
      */
     private $_conf;
+
     /**
      * Mysql connection resource
-     * @var    resource
+     *
+     * @var resource
      */
     private $_conn;
+
     /**
      * Db connection name
-     * @var    string
+     *
+     * @var string
      */
     private $_name;
+
     /**
      * Constructor
      *
      * Initialises the object by loading the config from the database.ini file
      *
-     * @param string $name The db connection name, as stored in the database.ini file
+     * @param  string $name The db connection name, as stored in the database.ini file
+     * @throws Exception Exception
      *
      * @return void
-     * @throws Exception Exception
      */
     public function __construct($name)
     {
@@ -79,6 +85,7 @@ class JabberBot_Db
         $this->_conf = $conf[$name];
         $this->_name = $name;
     }
+
     /**
      * Connect to db
      *
@@ -91,6 +98,7 @@ class JabberBot_Db
         $this->_conn = mysql_connect($this->_conf['host'], $this->_conf['user'], $this->_conf['pass']);
         mysql_select_db($this->_conf['db'], $this->_conn);
     }
+
     /**
      * Close the db connection
      *
@@ -100,6 +108,7 @@ class JabberBot_Db
     {
         mysql_close($this->_conn);
     }
+
     /**
      * Run a named query
      *
@@ -109,10 +118,9 @@ class JabberBot_Db
      * @param string $statement Method name is used as the statement name
      * @param array  $args      Array containing key => value pairs of arguments to substitute into
      *                          the statement.
+     * @throws Exception Exception
      *
-     * @return array     Results tabulated as an array (empty if the statement was INSERT or UPDATE)
-     * @throws Exception Exception
-     * @throws Exception Exception
+     * @return array Results tabulated as an array (empty if the statement was INSERT or UPDATE)
      */
     public function __call($statement, $args)
     {

@@ -40,15 +40,19 @@ class JabberBot_Command_List extends JabberBot_Command
 {
     /**
      * Quick Help
-     * @var    string
+     *
+     * @var string
      */
     public $quickHelp = '*list - display available commands';
+
     /**
      * Excecute the command
      *
      * Excecute the command against a specific message object.
      *
      * @param  JabberBot_Message The message to process
+     *
+     * @return void
      */
     public function run($message)
     {
@@ -58,13 +62,15 @@ class JabberBot_Command_List extends JabberBot_Command
         }
         $message->reply($text);
     }
+
     /**
      * Search message body for keywords.
      *
      * Search message body to detirmine whether we're interested in processing it.
      *
-     * @param  string $body The message body
-     * @return boolean  Check result
+     * @param string $body The message body
+     *
+     * @return bool
      */
     public function search($body)
     {

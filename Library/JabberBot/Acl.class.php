@@ -39,22 +39,25 @@ class JabberBot_Acl
 {
     /**
      * Trace of the checking process for debugging purposes
-     * @var    string
+     *
+     * @var string
      */
     public $trace;
-    
+
     /**
      * Db Adaptor for the ACL
-     * @var    JabberBot_Db
+     *
+     * @var JabberBot_Db
      */
     private $_acldb;
-    
+
     /**
      * Db Adaptor for performing user queries
+     *
      * @var    JabberBot_Db
      */
     private $_userdb;
-    
+
     /**
      * Constructor
      *
@@ -75,7 +78,7 @@ class JabberBot_Acl
             $this->_userdb = new JabberBot_Db('users');
         }
     }
-    
+
     /**
      * Perform ACL check
      *
@@ -84,8 +87,9 @@ class JabberBot_Acl
      * If not, shift up the tree and try again until a relevent rule is found.
      * If/when a new
      *
-     * @param  string $username Username requesting access
-     * @param  string $resource The resource name requested, separated by '/', e.g '/admin/user/add'
+     * @param string $username Username requesting access
+     * @param string $resource The resource name requested, separated by '/', e.g '/admin/user/add'
+     *
      * @return boolean
      */
     public function check($username, $resource)
@@ -101,7 +105,7 @@ class JabberBot_Acl
             // Check for rules at the present position
             $arrRules = $this->_acldb->getRulesForPosition(array('strPosition' => $position));
             foreach ($arrRules as $rule) {
-                $this->trace.= 'Found rule: ' . ($rule['allow'] ? 'allow' : 'deny') . ' ' 
+                $this->trace.= 'Found rule: ' . ($rule['allow'] ? 'allow' : 'deny') . ' '
                                         . $rule['property'] . ' ' . $rule['value'] . ' - ';
                 if ($this->{'_' . $rule['fnName']}($username, $rule['value'])) {
                     $this->trace.= 'Rule applied.' . PHP_EOL;
@@ -117,7 +121,7 @@ class JabberBot_Acl
         $this->trace.= 'No applicable rule was found';
         return false;
     }
-    
+
     /**
      * Check against a given username
      *
@@ -125,20 +129,22 @@ class JabberBot_Acl
      *
      * @param  string $username Username being tested
      * @param  string $value    Username assigned to the rule
+     *
      * @return boolean Test result
      */
     private function _checkUname($username, $value)
     {
         return $username == $value;
     }
-    
+
     /**
      * Check a user belongs to a group
      *
      * The rule applies to the user because they are a member of a group
      *
-     * @param  string  $username Username being tested
-     * @param  string  $value    The Group Handle
+     * @param string $username Username being tested
+     * @param string $value    The Group Handle
+     *
      * @return boolean Test result
      */
     private function _checkGroup($username, $handle)
@@ -151,15 +157,16 @@ class JabberBot_Acl
         }
         return false;
     }
-    
+
     /**
      * Check user level
      *
      * The rule applies to the user because their access 'level' is equal to or greater than
      * the specified level.
      *
-     * @param  string  $username Username being tested
-     * @param  int     $value    Level being tested against
+     * @param string $username Username being tested
+     * @param int    $value    Level being tested against
+     *
      * @return boolean Test result
      */
     private function _checkLevel($username, $value)
@@ -170,18 +177,19 @@ class JabberBot_Acl
         }
         return $result[0]['level'] >= $value;
     }
-    
+
     /**
      * Any user
      *
      * Defaults to true for any user
      *
-     * @param  string  $username Username being tested
-     * @param  mixed   $value    Always null
+     * @param string $username Username being tested
+     * @param mixed  $value    Always null
+     *
      * @return boolean Test result
      */
     private function _checkAny($username, $value)
     {
         return true;
     }
-} 
+}

@@ -38,24 +38,33 @@ class JabberBot_AccessDeniedException extends Exception
 {
     /**
      * Username who requested access
+     *
      * @var string
      */
     public $user;
+
     /**
      * Resource requested
+     *
      * @var string
      */
     public $resource;
+
     /**
      * Backtrace detailing the steps taken by the ACL checker
+     *
      * @var string
      */
+
     public $trace;
-    /** 
+    /**
      * Constructor
+     *
      * @param string $user
      * @param string $resource
      * @param string $trace
+     *
+     * @return void
      */
     public function __construct($user, $resource, $trace)
     {

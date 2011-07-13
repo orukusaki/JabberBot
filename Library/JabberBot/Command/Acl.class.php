@@ -40,25 +40,38 @@ class JabberBot_Command_Acl extends JabberBot_Command
 {
     /**
      * Quick Help
-     * @var    string
+     *
+     * @var string
      */
     public $quickHelp = '*acl - Access Control functions, type *acl help for more details';
+
     /**
      * Db Adaptor
-     * @var    JabberBot_Db
+     *
+     * @var JabberBot_Db
      */
     private $_db;
+
+    /**
+     * Constructior
+     * @param JabberBot_Bot $bot
+     *
+     * @return void
+     */
     public function __construct($bot)
     {
         parent::__construct($bot);
         $this->_db = new JabberBot_Db('acl');
     }
+
     /**
      * Excecute the command
      *
      * Excecute the command against a specific message object.
      *
-     * @param  JabberBot_Message $message The message to process
+     * @param JabberBot_Message $message The message to process
+     *
+     * @return void
      */
     public function run($message)
     {
@@ -155,12 +168,12 @@ class JabberBot_Command_Acl extends JabberBot_Command
             break;
         }
     }
+
     /**
-     * Search message body for keywords.
-     *
      * Search message body to detirmine whether we're interested in processing it.
      *
      * @param  string $body The message body
+     *
      * @return boolean  Check result
      */
     public function search($body)

@@ -1,8 +1,8 @@
 <?php
 /**
- * JabberBot_Command_Debug class
+ * JabberBot_Command_Jira class
  *
- * Contains the JabberBot_Command_Debug class
+ * Contains the JabberBot_Command_Jira class
  *
  * Copyright (C) 2011  Plusnet
  *
@@ -21,61 +21,64 @@
  *
  * @package   JabberBot
  * @subpackage Command
- * @author    Peter Smith <psmith@plus.net>
+ * @author    Stuart M. Grimshaw <stuart.grimshaw@gmail.com>
  * @copyright 2011 Plusnet
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
  */
 /**
- * Debug command
+ * Jira command
  *
- * Live debugging. Use with care
+ * Watches the channel for patterns that look like unlinked Jira issues & provides
+ * a link to them.
+ *
+ * You need to add a section to the config for this command.
+ *
+ * [jira]
+ * host = http://jira.host/
+ *
+ * Note the trailing /
  *
  * @package   JabberBot
  * @subpackage Command
- * @author    Peter Smith <psmith@plus.net>
- * @copyright 2011 Peter Smith
+ * @author    Stuart M. Grimshaw <stuart.grimshaw@gmail.com>
+ * @copyright 2011 Plusnet
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
  */
-class JabberBot_Command_Debug extends JabberBot_Command
+class JabberBot_Command_Jira extends JabberBot_Command
 {
     /**
-     * Quick Help
+     * Regex string for Jira tickets
      *
      * @var string
      */
-    public $quickHelp = '*debug - Only causes bad things to happen.';
+    const re = '/[[:upper:]]+-[[:digit:]]+/';
 
     /**
-     * Excecute the command
+     * Executes this command, takes the matched pattern
+     * and turns it into a Jira link which is then displayed
+     * to the channel.
      *
-     * Excecute the command against a specific message object.
-     *
-     * @param JabberBot_Message The message to process
+     * @see JabberBot_Command::run()
      *
      * @return void
      */
     public function run($message)
     {
-        $this->checkAcl($message->getUsername(), '/bot/debug');
-        $words = explode(' ', $message->body);
-        switch ($words[1]) {
-        case 'eval':
-            eval(substr($message->body, 12));
-            break;
-        }
+        $issue = preg_match(JabberBot_Command_Jira::re, $message->body, $matches);
+        $jiraConfig = $this->_bot->getConfig()->getValue("jira");
+
+        $message->reply($jiraConfig["host"] . "browse/" . $matches[0]);
     }
 
     /**
-     * Search message body for keywords.
+     * Searches the message body to decide if should be processed.
      *
-     * Search message body to detirmine whether we're interested in processing it.
+     * @see JabberBot_Command::search()
      *
-     * @param string $body The message body
-     *
-     * @return boolean Check result
+     * @return bool
      */
     public function search($body)
     {
-        return preg_match('/^\*debug\b/', $body);
+        return preg_match(JabberBot_Command_Jira::re, $body);
     }
 }

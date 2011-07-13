@@ -40,16 +40,19 @@ class JabberBot_Command_Twitter extends JabberBot_Command
 {
     /**
      * Quick Help
-     * @var    string
+     *
+     * @var string
      */
     public $quickHelp = '*twitter <username> - Fetch the latest twitter update for a user.';
-    
+
     /**
      * Excecute the command
      *
      * Excecute the command against a specific message object.
      *
      * @param  JabberBot_Message The message to process
+     *
+     * @return void
      */
     public function run($message)
     {
@@ -75,20 +78,21 @@ class JabberBot_Command_Twitter extends JabberBot_Command
                 return;
             }
             $xmlStatus = $nodelist->item(0);
-            $text = 'Last update from user ' . $words[1] . ' at ' 
-                   . $xmlStatus->getElementsByTagName('created_at')->item(0)->nodeValue . ':' . PHP_EOL 
+            $text = 'Last update from user ' . $words[1] . ' at '
+                   . $xmlStatus->getElementsByTagName('created_at')->item(0)->nodeValue . ':' . PHP_EOL
                    . $xmlStatus->getElementsByTagName('text')->item(0)->nodeValue;
             $message->reply($text);
         }
     }
-    
+
     /**
      * Search message body for keywords.
      *
      * Search message body to detirmine whether we're interested in processing it.
      *
-     * @param  string $body The message body
-     * @return boolean  Check result
+     * @param string $body The message body
+     *
+     * @return bool
      */
     public function search($body)
     {

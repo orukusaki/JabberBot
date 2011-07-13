@@ -33,59 +33,73 @@
  * @author    Peter Smith <psmith@plus.net>
  * @copyright 2011 Peter Smith
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
- * @see       References to other sections (if any)...
  */
 class JabberBot_Bot extends XMPPHP_XMPP
 {
     /**
      * Overriding protected property
-     * @var    array
+     *
+     * @var array
      * @see XMPPHP_XMPP::$resource
      */
     public $resource;
-    
+
     /**
      * Array containing any conference rooms we are in
-     * @var    array
+     *
+     * @var array
      */
     public $rooms;
-    
+
     /**
      * The name of the default room
-     * @var   string
+     *
+     * @var string
      */
     public $defaultRroom = null;
-    
+
     /**
      * A list of available commands
-     * @var    array
+     *
+     * @var array
      */
     public $arrCommands;
-    
+
     /**
      * The Access Control List object
-     * @var    JabberBot_Acl
+     *
+     * @var JabberBot_Acl
      */
     public $acl;
-    
+
     /**
      * Our db connection
-     * @var    JabberBot_Db
+     *
+     * @var JabberBot_Db
      */
     public $db;
-    
+
     /**
      * Ping interval (seconds)
+     *
      * @var int
      */
     public $pingInverval;
-    
+
     /**
      * The time at which the last message was received (or sent)
+     *
      * @var int
      */
     public $lastPing = 0;
-    
+
+    /**
+     * Holds the config for the bot.
+     *
+     * @var JabberBot_Config
+     */
+    private $_config;
+
     /**
      * Constructor
      *
@@ -97,24 +111,31 @@ class JabberBot_Bot extends XMPPHP_XMPP
     {
         // Load config
         $conf = parse_ini_file(dirname(__FILE__) . '/../../Config/JabberBot.ini', true);
-        $server = $conf['server'];
+
+        $this->_config = new JabberBot_Config($conf);
+
+        $server = $this->_config->getValue('server');
         $this->rooms = array();
         $this->db = new JabberBot_Db('bot');
         $this->acl = new JabberBot_Acl();
-        $this->defaultRoom = (isset($conf['bot']['defaultroom'])) ? $conf['bot']['defaultroom'] : null;
-        $this->pingInverval = $conf['bot']['pinginterval'];
+
+        $botConf = $this->_config->getValue('bot');
+
+        $this->defaultRoom = (isset($botConf['defaultroom'])) ? $botConf['defaultroom'] : null;
+        $this->pingInverval = $botConf['pinginterval'];
+
         // Call parent constructor, and set variables
         parent::__construct(
-            $server['host'], 
-            $server['port'], 
-            $server['user'], 
-            $server['password'], 
-            $server['resource'], 
-            null, 
-            true, 
-            $conf['bot']['loglevel']
+            $server['host'],
+            $server['port'],
+            $server['user'],
+            $server['password'],
+            $server['resource'],
+            null,
+            true,
+            $botConf['loglevel']
         );
-        
+
         $this->addEventHandler('reconnect', 'handleReconnect', $this);
         $this->useEncryption(($server['ssl'] == 'true'));
         // Set up Commands
@@ -148,11 +169,12 @@ class JabberBot_Bot extends XMPPHP_XMPP
         $this->presence();
         $this->resetPing();
     }
-    
+
     /**
      * Get a random message
      *
-     * @param  string  $handle The message handle
+     * @param string $handle The message handle
+     *
      * @return string A randomly selected message
      */
     public function getRandomQuote($handle)
@@ -160,11 +182,12 @@ class JabberBot_Bot extends XMPPHP_XMPP
         $table = $this->db->getRandomQuote(array('handle' => $handle));
         return $table[0]['message'];
     }
-    
+
     /**
      * Join a named conference room
      *
-     * @param  string  $room Room name
+     * @param string $room Room name
+     *
      * @return void
      */
     public function enterRoom($room)
@@ -173,19 +196,20 @@ class JabberBot_Bot extends XMPPHP_XMPP
             return;
         }
         $this->presence(
-            null, 
-            'available', 
-            $room . '@conference.' . $this->host . '/' . $this->resource, 
+            null,
+            'available',
+            $room . '@conference.' . $this->host . '/' . $this->resource,
             'available', 1
         );
         $this->rooms[] = $room;
         $this->sendToRoom($room, $this->getRandomQuote('greeting'));
     }
-    
+
     /**
      * Leave a conference room
      *
-     * @param  string  $room Room name
+     * @param string $room Room name
+     *
      * @return void
      */
     public function leaveRoom($room)
@@ -195,18 +219,19 @@ class JabberBot_Bot extends XMPPHP_XMPP
         }
         $this->sendToRoom($room, $this->getRandomQuote('parting'));
         $this->presence(
-            null, 'unavailable', 
+            null, 'unavailable',
             $room . '@conference.' . $this->host . '/' . $this->resource, 'unavailable', 1
         );
         unset($this->rooms[array_search($room, $this->rooms) ]);
     }
-    
+
     /**
      * Send a message to a conference room.  Join it if we're not already in it.
      *
      *
-     * @param  string  $room    The room name
-     * @param  string  $message The message to send
+     * @param string $room    The room name
+     * @param string $message The message to send
+     *
      * @return void
      */
     public function sendToRoom($room, $message)
@@ -216,49 +241,49 @@ class JabberBot_Bot extends XMPPHP_XMPP
         }
         $this->message($room . '@' . 'conference.' . $this->host, $message, 'groupchat');
     }
-    
+
     /**
      * Are we in a named room?
      *
-     * Long description (if any) ...
+     * @param string $room Room name
      *
-     * @param  unknown $room Room name
-     * @return bool    Check result
+     * @return bool Check result
      */
     public function inRoom($room)
     {
         return in_array($room, $this->rooms);
     }
-    
+
     /**
      * Send a message in HTML format
      *
      * Sends a message with an HTML payload attached.
      *
-     * @param  unknown $to   Address to send the message to
-     * @param  string  $msg  The message text (including any HTML tags)
-     * @param  string  $type 'chat' or 'groupchat'
+     * @param string $to   Address to send the message to
+     * @param string $msg  The message text (including any HTML tags)
+     * @param string $type 'chat' or 'groupchat'
+     *
      * @return void
      */
     public function messageHtml($to, $msg, $type)
     {
         $payload = '<html xmlns="http://jabber.org/protocol/xhtml-im">
-			<body xmlns="http://www.w3.org/1999/xhtml">' . $msg . '</body></html>';
+            <body xmlns="http://www.w3.org/1999/xhtml">' . $msg . '</body></html>';
         $this->message($to, strip_tags($msg), $type, null, $payload);
     }
-    
+
     /**
      * Process an inbound message
      *
      * For each loaded command object, check whether it's interested in processing the message.
      * Run each interested command.
      *
-     * @param  JabberBot_Message  $message The inbound message.
+     * @param  JabberBot_Message $message The inbound message.
+     *
      * @return void
      */
-    private function _processMessage($pl)
+    private function _processMessage(JabberBot_Message $message)
     {
-        $message = new JabberBot_Message($pl, $this);
         if ($message->wasFromMe()) {
             $this->log->log('msg from me ignored', XMPPHP_Log::LEVEL_VERBOSE);
             return;
@@ -279,7 +304,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
                     $message->reply($this->getRandomQuote('denied'));
                 }
                 catch (Exception $e) {
-                	$message->reply($e->getMessage());
+                    $message->reply($e->getMessage());
                 }
             }
         }
@@ -288,8 +313,9 @@ class JabberBot_Bot extends XMPPHP_XMPP
     }
     /**
      * Handle Reconnect Event
-     * 
+     *
      * If we reconnected becasuse of a server timeout, ensure that room presences are restored
+     *
      * @return void
      */
     public function handleReconnect()
@@ -303,43 +329,46 @@ class JabberBot_Bot extends XMPPHP_XMPP
         }
         $this->presence();
     }
-    
+
     /**
      * Reset Ping timeout
      *
-     * Resets the time since the last message was sent or received. 
+     * Resets the time since the last message was sent or received.
+     *
+     * @return void
      */
     public function resetPing()
     {
         $this->lastPing = time();
     }
-    
+
     /**
      * Ping If Necessary
-     * 
+     *
      * Sends a ping mesasge to the server if there has not been a message
      * sent or received since the timeout interval.
-     *  
-     * @return void 
+     *
+     * @return void
      */
-    public function pingIfNecessary() 
+    public function pingIfNecessary()
     {
         if (
-            $this->pingInverval != 0 
+            $this->pingInverval != 0
             && $this->lastPing + $this->pingInverval < time()
             ) {
             $this->ping();
             $this->resetPing();
         }
     }
-    
+
     /**
      * Check Inbound messages
      *
      * Receives inbound messages and processes them.
+     *
      * @return void
      */
-    public function readInbound() 
+    public function readInbound()
     {
         $payloads = $this->processUntil(array('message', 'presence', 'end_stream', 'session_start', 'vcard'), 2);
         foreach ($payloads as $event) {
@@ -347,7 +376,7 @@ class JabberBot_Bot extends XMPPHP_XMPP
             $pl = $event[1];
             switch ($event[0]) {
             case 'message':
-                $this->_processMessage($pl);
+                $this->_processMessage(new JabberBot_Message($pl, $this));
                 break;
 
             case 'presence':
@@ -364,11 +393,12 @@ class JabberBot_Bot extends XMPPHP_XMPP
 
     /**
      * Check oubound message queue
-     * 
+     *
      * Checks the database for messages queued up to send.
+     *
      * @return void
      */
-    public function checkMessageQueue() 
+    public function checkMessageQueue()
     {
         $arrQueue = $this->db->checkMessageQueue();
         foreach ($arrQueue as $queuedMessage) {
@@ -382,5 +412,24 @@ class JabberBot_Bot extends XMPPHP_XMPP
         }
         unset($arrQueue);
     }
-    
+
+    /**
+     * Get the config object
+     *
+     * @return JabberBot_Config
+     */
+    public function getConfig() {
+        return $this->_config;
+    }
+
+    /**
+     * Set the config object
+     *
+     * @param JabberBot_Config $config
+     *
+     * @return void
+     */
+    public function setConfig($config) {
+        $this->_config = $config;
+    }
 }

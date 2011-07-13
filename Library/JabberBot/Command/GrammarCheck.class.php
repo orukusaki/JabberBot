@@ -41,20 +41,25 @@ class JabberBot_Command_GrammarCheck extends JabberBot_Command
 {
     /**
      * Quick Help
-     * @var    string
+     *
+     * @var string
      */
     public $quickHelp = '*grammar <on|off> - Controls grammar checking';
+
     /**
      * Grammar checker state
+     *
      * @var    boolean
      */
     private $_bolActive;
+
     /**
      * Constructor
      *
      * Set the default state to active
      *
      * @param  JabberBot_Bot $bot Backlink to owning bot object
+     *
      * @return void
      */
     public function __construct($bot)
@@ -62,12 +67,15 @@ class JabberBot_Command_GrammarCheck extends JabberBot_Command
         parent::__construct($bot);
         $this->_bolActive = true;
     }
+
     /**
      * Excecute the command
      *
      * Excecute the command against a specific message object.
      *
-     * @param  JabberBot_Message $message The inbound message
+     * @param JabberBot_Message $message The inbound message
+     *
+     * @return void
      */
     public function run($message)
     {
@@ -115,12 +123,14 @@ class JabberBot_Command_GrammarCheck extends JabberBot_Command
             }
         }
     }
+
     /**
      * Search message body for keywords.
      *
      * Search message body to detirmine whether we're interested in processing it.
      *
-     * @param  string $body The message body
+     * @param string $body The message body
+     *
      * @return boolean  Check result
      */
     public function search($body)

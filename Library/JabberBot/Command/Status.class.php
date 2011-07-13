@@ -40,22 +40,24 @@ class JabberBot_Command_Status extends JabberBot_Command
 {
     /**
      * Quick Help
-     * @var    string
+     *
+     * @var string
      */
     public $quickHelp = '*status - Report on my status.';
-    
+
     /**
      * The time at which the object was created.
-     * @var    number
+     * @var number
      */
     private $_startTime;
-    
+
     /**
      * Constructor
      *
      * Saves the start time for use later.
      *
-     * @param  JabberBot_Bot $bot
+     * @param JabberBot_Bot $bot
+     *
      * @return void
      */
     public function __construct($bot)
@@ -69,6 +71,8 @@ class JabberBot_Command_Status extends JabberBot_Command
      * Excecute the command against a specific message object.
      *
      * @param  JabberBot_Message The message to process
+     *
+     * @return void
      */
     public function run($message)
     {
@@ -80,35 +84,37 @@ class JabberBot_Command_Status extends JabberBot_Command
         $upTime%= 3600;
         $minutes = floor($upTime / 60);
         $upTime%= 60;
-        $text = 'Uptime: ' . $this->_pl('day', $days) . ', ' 
-                           . $this->_pl('hour', $hours) . ', ' 
+        $text = 'Uptime: ' . $this->_pl('day', $days) . ', '
+                           . $this->_pl('hour', $hours) . ', '
                            . $this->_pl('minute', $minutes) . '. ';
         $text.= 'Memory usage: ' . memory_get_usage() . ' bytes.';
         $text.= ' Status: ' . $this->_bot->getRandomQuote('status') . '.';
         $message->reply($text);
     }
-    
+
     /**
      * Search message body for keywords.
      *
      * Search message body to detirmine whether we're interested in processing it.
      *
-     * @param  string $body The message body
-     * @return boolean  Check result
+     * @param string $body The message body
+     *
+     * @return bool
      */
     public function search($body)
     {
         return preg_match('/^\*status\b/', $body);
     }
-    
+
     /**
      * Pluralise a unit
      *
      * Convenience function, pluralise a unit based on the value
      *
-     * @param  string  $txt unit name
-     * @param  mixed   $num value
-     * @return string  The value followed by the unit, pluralised if necessary.
+     * @param string $txt unit name
+     * @param mixed  $num value
+     *
+     * @return string The value followed by the unit, pluralised if necessary.
      */
     private function _pl($txt, $num)
     {

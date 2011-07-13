@@ -41,15 +41,19 @@ class JabberBot_Command_Remind extends JabberBot_Command
 {
     /**
      * Quick Help
-     * @var    string
+     *
+     * @var string
      */
     public $quickHelp = '*remind <when>, <message> - Set a reminder.';
+
     /**
      * Excecute the command
      *
      * Excecute the command against a specific message object.
      *
-     * @param  JabberBot_Message The message to process
+     * @param JabberBot_Message The message to process
+     *
+     * @return void
      */
     public function run($message)
     {
@@ -62,7 +66,7 @@ class JabberBot_Command_Remind extends JabberBot_Command
         $uxtTime = strtotime($matches[1]);
         if (!$uxtTime) {
             $message->reply(
-                'Couldn\'t figure out when you want the reminder.  ' 
+                'Couldn\'t figure out when you want the reminder.  '
                 . 'Check http://www.php.net/manual/en/datetime.formats.php'
             );
             return;
@@ -70,21 +74,23 @@ class JabberBot_Command_Remind extends JabberBot_Command
         $senderSplit = explode('@', $message->getReplyAddress());
         $this->_bot->db->createQueuedMessage(
             array(
-                'to' => $senderSplit[0], 
-                 'type' => $message->type, 
-                 'due' => date('Y-m-d H:i', $uxtTime), 
+                'to' => $senderSplit[0],
+                 'type' => $message->type,
+                 'due' => date('Y-m-d H:i', $uxtTime),
                  'message' => 'Reminder set by ' . $message->getUsername() . ': ' . $matches[2]
            )
         );
         $message->reply('Reminder set for ' . date('Y-m-d H:i ', $uxtTime));
     }
+
     /**
      * Search message body for keywords.
      *
      * Search message body to detirmine whether we're interested in processing it.
      *
-     * @param  string $body The message body
-     * @return boolean  Check result
+     * @param string $body The message body
+     *
+     * @return bool
      */
     public function search($body)
     {
