@@ -39,47 +39,57 @@ abstract class JabberBot_Command
 {
     /**
      * Reference link back to the owning bot.
-     * @var    object
+     *
+     * @var object
      */
     protected $_bot;
+
     /**
      * Quick Help
-     * @var    string
+     *
+     * @var string
      */
     public $quickHelp;
+
     /**
      * Constructor
      *
      * Stores the backlink for the calling bot.
      *
-     * @param  unknown $bot Reference link back to the owning bot.
+     * @param JabberBot_Bot $bot Reference link back to the owning bot.
+     *
      * @return void
      */
     public function __construct($bot)
     {
         $this->_bot = $bot;
     }
+
     /**
      * Excecute the command
      *
      * Excecute the command against a specific message object.
      *
-     * @param  JabberBot_Message $message The inbound message
+     * @param JabberBot_Message $message The inbound message
      */
     public abstract function run($message);
+
     /**
      * Search message body for keywords.
      *
      * Search message body to detirmine whether we're interested in processing it.
      *
-     * @param  string $body The message body
+     * @param string $body The message body
+     *
      * @return boolean  Check result
      */
     public abstract function search($body);
+
     /**
      * Formats a two-dimentional array as a table for printing
      *
      * @param array $table
+     *
      * @return void
      */
     public static function drawTable($table)
@@ -116,11 +126,13 @@ abstract class JabberBot_Command
         }
         return $text;
     }
+
     /**
-     * Pads the text in an array according to the widths in another array
+     * Pad the text in an array according to the widths in another array
      *
      * @param array $row       The array to format
      * @param array $colWidths The column widths
+     *
      * @return array The formatted array
      */
     public static function padArray($row, $colWidths)
@@ -132,14 +144,18 @@ abstract class JabberBot_Command
         }
         return $row;
     }
+
     /**
      * Check ACL
      *
      * Checks the with the ACL whether a given user can access a
      * particular resource.  Throws an exception on failure
-     * @param $username
-     * @param $resource
+     *
+     * @param  $username
+     * @param  $resource
      * @throws JabberBot_AccessDeniedException
+     *
+     * @return void
      */
     protected function checkAcl($username, $resource)
     {

@@ -38,34 +38,45 @@ class JabberBot_Message
 {
     /**
      * Text body of the message
-     * @var    string
+     *
+     * @var string
      */
     public $body;
+
     /**
      * Content of the 'from' attribute of the message
-     * @var    string
+     *
+     * @var string
      */
     public $from;
+
     /**
      * Xml representation of the message
-     * @var    mixed
+     *
+     * @var string
      */
     public $xml;
+
     /**
      * Type of message ('chat' / 'groupchat')
-     * @var    string
+     *
+     * @var string
      */
     public $type;
+
     /**
      * Reference link back to the JabberBot object
-     * @var    JabberBot_Bot
+     *
+     * @var JabberBot_Bot
      */
     private $_bot;
+
     /**
      * Constructor
      *
-     * @param  array         $pl   The message payload as returned by XMPPHP_XMPP::process()
-     * @param  JabberBot_Bot $bot  Reference link back to the JabberBot object
+     * @param array         $pl   The message payload as returned by XMPPHP_XMPP::process()
+     * @param JabberBot_Bot $bot  Reference link back to the JabberBot object
+     *
      * @return void
      */
     public function __construct($pl, $bot)
@@ -76,12 +87,13 @@ class JabberBot_Message
         $this->type = $pl['type'];
         $this->_bot = $bot;
     }
+
     /**
      * Was the messasge from me
      *
      * Determines whether the message is actually from us, and was echoed back from the XMPP server
      *
-     * @return boolean  Check result
+     * @return boolean Check result
      */
     public function wasFromMe()
     {
@@ -94,6 +106,7 @@ class JabberBot_Message
         }
         return ($parts[1] == $this->_bot->resource);
     }
+
     /**
      * Get reply address
      *
@@ -114,18 +127,20 @@ class JabberBot_Message
             break;
         }
     }
+
     /**
      * Get The username of the sender
      *
      * Examines the roster to detirmine the username of the sender.
      *
-     * @return string  The username of the sender
+     * @return string The username of the sender
      */
     public function getUsername()
     {
         $presence = $this->_bot->roster->getPresence($this->from);
         return $presence['username'];
     }
+
     /**
      * Was this message delayed?
      *
@@ -144,24 +159,28 @@ class JabberBot_Message
         }
         return $wasDelayed;
     }
+
     /**
      * Reply
      *
      * Send a message back to the sender of this message.
      *
-     * @param  unknown $text The message to send
+     * @param string $text The message to send
+     *
      * @return void
      */
     public function reply($text)
     {
         $this->_bot->message($this->getReplyAddress(), $text, $this->type);
     }
+
     /**
      * Reply in HTML
      *
      * Send a message back to the sender of this message with HTML formatting
      *
-     * @param  unknown $text The message to send
+     * @param string $text The message to send
+     *
      * @return void
      */
     public function replyHTML($text)

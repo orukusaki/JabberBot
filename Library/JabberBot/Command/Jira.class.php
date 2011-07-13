@@ -1,8 +1,8 @@
 <?php
 /**
- * JabberBot_Command_Twitter class
+ * JabberBot_Command_Jira class
  *
- * Contains the JabberBot_Command_Twitter class
+ * Contains the JabberBot_Command_Jira class
  *
  * Copyright (C) 2011  Plusnet
  *
@@ -30,12 +30,12 @@
  *
  * Watches the channel for patterns that look like unlinked Jira issues & provides
  * a link to them.
- * 
+ *
  * You need to add a section to the config for this command.
- * 
+ *
  * [jira]
  * host = http://jira.host/
- * 
+ *
  * Note the trailing /
  *
  * @package   JabberBot
@@ -44,29 +44,41 @@
  * @copyright 2011 Plusnet
  * @license   http://www.opensource.org/licenses/gpl-3.0 GNU General Public License, version 3
  */
-
 class JabberBot_Command_Jira extends JabberBot_Command
 {
-	const re = '/[[:upper:]]+-[[:digit:]]+/';
-	
-	/**
-	 * Executes this command, takes the matched pattern
-	 * and turns it into a Jira link which is then displayed
-	 * to the channel.
-	 * 
-	 * @see JabberBot_Command::run()
-	 */
-	public function run($message)
-	{
-		$issue = preg_match(JabberBot_Command_Jira::re, $message->body, $matches);
-		$jiraConfig = $this->_bot->getConfig()->getValue("jira"); 
+    /**
+     * Regex string for Jira tickets
+     *
+     * @var string
+     */
+    const re = '/[[:upper:]]+-[[:digit:]]+/';
 
-		$message->reply($jiraConfig["host"] . "browse/" . $matches[0]);
-	}
-	
-	public function search($body)
-	{
-		return preg_match(JabberBot_Command_Jira::re, $body);
-	}
+    /**
+     * Executes this command, takes the matched pattern
+     * and turns it into a Jira link which is then displayed
+     * to the channel.
+     *
+     * @see JabberBot_Command::run()
+     *
+     * @return void
+     */
+    public function run($message)
+    {
+        $issue = preg_match(JabberBot_Command_Jira::re, $message->body, $matches);
+        $jiraConfig = $this->_bot->getConfig()->getValue("jira");
+
+        $message->reply($jiraConfig["host"] . "browse/" . $matches[0]);
+    }
+
+    /**
+     * Searches the message body to decide if should be processed.
+     *
+     * @see JabberBot_Command::search()
+     *
+     * @return bool
+     */
+    public function search($body)
+    {
+        return preg_match(JabberBot_Command_Jira::re, $body);
+    }
 }
-?>
