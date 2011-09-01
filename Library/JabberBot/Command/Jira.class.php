@@ -35,6 +35,8 @@
  *
  * [jira]
  * host = http://jira.host/
+ * user = username
+ * password = password
  *
  * Note the trailing /
  *
@@ -51,7 +53,14 @@ class JabberBot_Command_Jira extends JabberBot_Command
      *
      * @var string
      */
-    const re = '/[[:upper:]]+-[[:digit:]]+/';
+    const re = '/(\s|^)([[:upper:]]+-[[:digit:]]+)/';
+
+    /**
+     * Quick Help
+     *
+     * @var string
+     */
+    public $quickHelp = 'XXX-123 - parse a JIRA link';
 
     /**
      * Executes this command, takes the matched pattern
@@ -67,7 +76,7 @@ class JabberBot_Command_Jira extends JabberBot_Command
         $issue = preg_match(JabberBot_Command_Jira::re, $message->body, $matches);
         $jiraConfig = $this->_bot->getConfig()->getValue("jira");
 
-        $message->reply($jiraConfig["host"] . "browse/" . $matches[0]);
+        $message->reply($jiraConfig["host"] . "browse/" . $matches[2]);
     }
 
     /**
