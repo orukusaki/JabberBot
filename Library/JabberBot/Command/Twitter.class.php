@@ -43,7 +43,7 @@ class JabberBot_Command_Twitter extends JabberBot_Command
      *
      * @var string
      */
-    public $quickHelp = '*twitter <username> - Fetch the latest twitter update for a user.';
+    public $quickHelp = '*twitter <username|status_id> - Fetch the latest twitter update for a user.';
 
     /**
      * Excecute the command
@@ -59,30 +59,78 @@ class JabberBot_Command_Twitter extends JabberBot_Command
         $this->checkAcl($message->getUsername(), '/bot/twitter');
         $words = explode(' ', $message->body);
         if (!isset($words[1])) {
-            $message->reply("What username?");
+            $message->reply("What username/status id?");
             return;
         }
-        $url = 'http://api.twitter.com/1/users/show.xml?screen_name=' . $words[1];
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        if (!$strReturn = curl_exec($curl)) {
-            $this->_bot->log->log("Curl failed", XMPPHP_Log::LEVEL_WARNING);
-            return;
+
+        if (preg_match('/^\d{18}$/', $words[1])) {
+            $update = $this->fetchStatusById($words[1]);
         } else {
-            $xml = new DOMDocument();
-            $xml->loadXML($strReturn);
-            $xp = new DOMXPath($xml);
-            $nodelist = $xp->query('/user/status');
-            if ($nodelist->length != 1) {
-                $message->reply('Failed to find an update for user ' . $words[1]);
-                return;
-            }
-            $xmlStatus = $nodelist->item(0);
-            $text = 'Last update from user ' . $words[1] . ' at '
-                   . $xmlStatus->getElementsByTagName('created_at')->item(0)->nodeValue . ':' . PHP_EOL
-                   . $xmlStatus->getElementsByTagName('text')->item(0)->nodeValue;
-            $message->reply($text);
+            $update = $this->fetchStatusByUsername($words[1]);
         }
+
+        $text = 'Update from '
+               . $update['user'] . ' at '
+               . $update['time'] . ':' . PHP_EOL
+               . $update['text'];
+
+        $message->reply($text);
+    }
+
+    /**
+     * Fetch a twitter status by status id
+     *
+     * @param string $id
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    protected function fetchStatusById($id) {
+
+        $url = "http://api.twitter.com/1/statuses/show/$id.json?include_entities=false";
+        $return = $this->curlGet($url);
+        $returnData = json_decode($return, true);
+
+        if (!is_array($returnData) || !isset($returnData['text'])) {
+
+            throw new JabberBot_RemoteDataException("Fetching Status Id $id Failed");
+        }
+
+        return array(
+            'user'   => $returnData['user']['name'],
+            'text'   => $returnData['text'],
+            'time'   => $returnData['created_at'],
+        );
+    }
+
+    /**
+     * Fetch the latest twitter status for a given username
+     *
+     * @param string $username
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    protected function fetchStatusByUsername($username) {
+
+        $url = "http://api.twitter.com/1/users/show.json?include_entities=false&screen_name=$username";
+        $return = $this->curlGet($url);
+        $returnData = json_decode($return, true);
+
+        if (!is_array($returnData)
+            || !isset($returnData['status'])
+            || !isset($returnData['status']['text'])
+        ) {
+            throw new JabberBot_RemoteDataException("Fetching Status For User $username Failed");
+        }
+
+        return array(
+            'user'   => $returnData['name'],
+            'text'   => $returnData['status']['text'],
+            'time'   => $returnData['status']['created_at'],
+        );
     }
 
     /**

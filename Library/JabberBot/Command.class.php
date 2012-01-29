@@ -128,6 +128,21 @@ abstract class JabberBot_Command
     }
 
     /**
+     * Fetch a url with an HTTP GET request
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    protected function curlGet($url) {
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        return curl_exec($curl);
+    }
+
+    /**
      * Pad the text in an array according to the widths in another array
      *
      * @param array $row       The array to format

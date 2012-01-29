@@ -69,6 +69,25 @@ class JabberBot_Command_GrammarCheck extends JabberBot_Command
     }
 
     /**
+     * Last time we sent a Grammar Check
+     *
+     * afterthedeadline have implimented some kind of anti-DoS system
+     * if we send two requests close together, the second one fails.
+     * This var is used to check that we're not sending requests too
+     * close together.
+     *
+     * @var int
+     */
+    private static $_lastCheck = 0;
+
+    /**
+     * Minumum time gap in seconds
+     *
+     * @var int
+     */
+    const MIN_GAP = 1;
+
+    /**
      * Excecute the command
      *
      * Excecute the command against a specific message object.
@@ -98,29 +117,32 @@ class JabberBot_Command_GrammarCheck extends JabberBot_Command
             $encoded = urlencode($text);
             $apikey = 'JabberBot' . md5(getmypid());
             $url = 'http://service.afterthedeadline.com/checkGrammar?key=' . $apikey . '&data=' . $encoded;
-            $curl = curl_init($url);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            if (!$strReturn = curl_exec($curl)) {
-                $this->_bot->log->log('Curl failed', XMPPHP_Log::LEVEL_WARNING);
-                return false;
-            } else {
-                $xml = new DOMDocument();
-                $xml->loadXML($strReturn);
-                $xp = new DOMXPath($xml);
-                $errorList = $xp->query('/results/error[count(suggestions/option)>0]');
-                $errorCount = $errorList->length;
-                $this->_bot->log->log('Found ' . $errorCount . ' error(s)', XMPPHP_Log::LEVEL_INFO);
-                if ($errorCount == 0) {
-                    return;
-                }
-                foreach ($errorList as $xmlError) {
-                    $badString = $xp->evaluate('string', $xmlError)->item(0)->nodeValue;
-                    $goodString = $xp->query('suggestions/option', $xmlError)->item(0)->nodeValue;
-                    $this->_bot->log->log($badString . ' => ' . $goodString, XMPPHP_Log::LEVEL_INFO);
-                    $text = preg_replace('/\b' . $badString . '\b/', '<b>' . $goodString . '</b>', $text, 1);
-                }
-                $message->replyHTML(nl2br($text));
+
+            if (time() <= self::$_lastCheck + self::MIN_GAP) {
+                sleep(1);
             }
+
+            $strReturn = $this->curlGet($url);
+
+            self::$_lastCheck = time();
+
+            $xml = new DOMDocument();
+
+            $xml->loadXML($strReturn);
+            $xp = new DOMXPath($xml);
+            $errorList = $xp->query('/results/error[count(suggestions/option)>0]');
+            $errorCount = $errorList->length;
+            $this->_bot->log->log('Found ' . $errorCount . ' error(s)', XMPPHP_Log::LEVEL_INFO);
+            if ($errorCount == 0) {
+                return;
+            }
+            foreach ($errorList as $xmlError) {
+                $badString = $xp->evaluate('string', $xmlError)->item(0)->nodeValue;
+                $goodString = $xp->query('suggestions/option', $xmlError)->item(0)->nodeValue;
+                $this->_bot->log->log($badString . ' => ' . $goodString, XMPPHP_Log::LEVEL_INFO);
+                $text = preg_replace('/\b' . $badString . '\b/', '<b>' . $goodString . '</b>', $text, 1);
+            }
+            $message->replyHTML(nl2br($text));
         }
     }
 
