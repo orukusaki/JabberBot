@@ -54,7 +54,7 @@ class JabberBot_Acl
     /**
      * Db Adaptor for performing user queries
      *
-     * @var    JabberBot_Db
+     * @var JabberBot_Db
      */
     private $_userdb;
 
@@ -127,8 +127,8 @@ class JabberBot_Acl
      *
      * The rule applies to the specified user.
      *
-     * @param  string $username Username being tested
-     * @param  string $value    Username assigned to the rule
+     * @param string $username Username being tested
+     * @param string $value    Username assigned to the rule
      *
      * @return boolean Test result
      */
@@ -143,13 +143,13 @@ class JabberBot_Acl
      * The rule applies to the user because they are a member of a group
      *
      * @param string $username Username being tested
-     * @param string $value    The Group Handle
+     * @param string $handle   The Group Handle
      *
      * @return boolean Test result
      */
     private function _checkGroup($username, $handle)
     {
-        $usersInGroup = $this->_userdb->getGroupMembersByHandle($handle);
+        $usersInGroup = $this->_userdb->getGroupMembersByHandle(array('handle' => $handle));
         foreach ($usersInGroup as $member) {
             if ($member['username'] == $username) {
                 return true;
